@@ -390,6 +390,9 @@ body.lang-zh .tile-zh{font-size:clamp(22px,2.8vw,32px);opacity:1}
 .vp-pick small{color:var(--muted);font-weight:700;font-size:13px}
 .vp-row .pill{font-size:14px;padding:7px 12px}
 .vp-tip{margin:14px 0 4px;background:#fff9db;border-radius:14px;padding:10px 12px;font-size:14px;line-height:1.5}
+.neat-fx{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:#fff;border-radius:999px;padding:8px 18px;font-weight:900;font-size:clamp(18px,2.6vw,24px);box-shadow:0 5px 0 var(--edge);animation:popin .35s;white-space:nowrap}
+.neat-fx.n0{color:var(--muted)}
+.neat-fx.n2{color:#2b8a3e}
 .records{width:min(860px,100%);margin-top:14px;text-align:left}
 .records h3{font-size:clamp(20px,2.8vw,26px);margin:18px 0 8px}
 .rec-wrap{overflow-x:auto;border-radius:20px;box-shadow:0 5px 0 var(--edge)}
@@ -565,6 +568,10 @@ function pickVoice(code){
   const pref = raw.get('academy.voice.' + code), list = voicesFor(code);
   return (pref && list.find(v => v.name === pref)) || list[0] || null;
 }
+const LETTER_NAMES = {a:'ay', b:'bee', c:'see', d:'dee', e:'ee', f:'eff', g:'jee', h:'aitch', i:'eye', j:'jay', k:'kay', l:'ell', m:'em',
+  n:'en', o:'oh', p:'pee', q:'cue', r:'ar', s:'ess', t:'tee', u:'you', v:'vee', w:'double you', x:'ex', y:'why', z:'zee'};
+const letterName = ch => LETTER_NAMES[String(ch).toLowerCase()] || ch;
+const spellOut = w => String(w).split('').filter(c => /[a-z]/i.test(c)).map(letterName).join(', ') + '.';
 function speakParts(parts){
   if (!hasSpeech) return;
   speechSynthesis.cancel();
@@ -585,7 +592,7 @@ function say(en, zh){
 }
 // spell it out: "cat… C, A, T… cat" (+ Chinese)
 function spellWord(w, zh){
-  const letters = w.toUpperCase().split('').join(', ') + '.';
+  const letters = spellOut(w);
   speakParts([[w, 'en-US', 0.7], [letters, 'en-US', 0.55], [w, 'en-US', 0.7], ...(zh && lang !== 'en' ? [[zh, 'zh-CN']] : [])]);
 }
 // microphone: he says the word, the iPad's speech recognition checks it
@@ -836,12 +843,18 @@ function logToday(fn){
   const e = Object.assign({stars: 0, trace: 0, words: null, math: null, paid: 0, habits: [], mood: null}, log[k]);
   fn(e); log[k] = e; store.set('daylog', log);
 }
-/* daily writing task: one letter + one number + one word */
+/* daily writing task: one letter + one number + five words */
+const WRITE_WORDS = 5;
 const WRITE_KINDS = [['letter', '🔤', 'Letter', '字母'], ['number', '🔢', 'Number', '数字'], ['word', '📝', 'Word', '单词']];
 const writeDoneCount = tw => WRITE_KINDS.filter(([k]) => tw && tw[k]).length;
 function markWrite(kind, fromEl){
   let before = 0, after = 0;
-  logToday(e => { e.tw = Object.assign({}, e.tw); before = writeDoneCount(e.tw); e.tw[kind] = true; after = writeDoneCount(e.tw); });
+  logToday(e => {
+    e.tw = Object.assign({}, e.tw); before = writeDoneCount(e.tw);
+    if (kind === 'word'){ e.twWords = (e.twWords || 0) + 1; if (e.twWords >= WRITE_WORDS) e.tw.word = true; }
+    else e.tw[kind] = true;
+    after = writeDoneCount(e.tw);
+  });
   if (after === WRITE_KINDS.length && before < after){
     store.set('trace.game', {d: todayKey(), score: after});
     later(() => taskBonus('trace', fromEl), 50);
@@ -850,9 +863,10 @@ function markWrite(kind, fromEl){
 }
 function drawWriteStrip(){
   const el = document.getElementById('writeStrip'); if (!el) return;
-  const tw = todayLog().tw || {};
+  const t = todayLog(), tw = t.tw || {};
+  const words = Math.min(t.twWords || 0, WRITE_WORDS);
   el.innerHTML = `<b>Today 今日</b>${WRITE_KINDS.map(([k, ic, en, zh]) =>
-    `<span class="ws ${tw[k] ? 'ok' : ''}">${tw[k] ? '✅' : '⬜'} ${ic} ${en}<small>${zh}</small></span>`).join('')}`;
+    `<span class="ws ${tw[k] ? 'ok' : ''}">${tw[k] ? '✅' : '⬜'} ${ic} ${k === 'word' ? `Words ${words}/${WRITE_WORDS}` : en}<small>${zh}</small></span>`).join('')}`;
 }
 const TASK_BONUS = 3;
 function taskBonus(task, fromEl){
@@ -2150,7 +2164,7 @@ function dailyGame(){
         <button class="${last ? 'ok-btn' : 'round'} chunky ready" id="tNext" aria-label="Next">${last ? "🎮 Let's play!<span class=\"zh\">开始游戏</span>" : IC.next}</button>
       </div>`;
     // word, then "say it with me", then the word again (slower), then Chinese
-    const speak = () => speakParts([[it.w, 'en-US', 0.7], [it.w.toUpperCase().split('').join(', ') + '.', 'en-US', 0.55],
+    const speak = () => speakParts([[it.w, 'en-US', 0.7], [spellOut(it.w), 'en-US', 0.55],
       ...(lang !== 'zh' ? [['Say it with me:', 'en-US']] : [['跟我读：', 'zh-CN']]),
       [it.w, 'en-US', 0.6], ...(lang !== 'en' ? [[it.zh, 'zh-CN']] : [])]);
     stage.querySelector('#tCard').onclick = () => { sfx.pop(); speak(); };
@@ -2248,6 +2262,7 @@ const WORDS = [
 ];
 const CRAYONS = ['#7048e8','#f03e3e','#1c7ed6','#2f9e44','#f76707','#e64980'];
 const TRACE_TOL = 17;   // how far (in letter units) the pen may wander from the path
+const NEAT_TOL = 8, NEAT_2 = 0.85, NEAT_1 = 0.55;   // word-trace stars: 2 if 85%+ of his line is on the path, 1 if 55%+
 const TRACE_LOOK = 7;   // how many sample points ahead the pen may "skip"
 const pathD = pts => 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L');
 function samplePts(pts){
@@ -2325,7 +2340,7 @@ function wordItem(w, zh, e, L){
     hint: `<span class="emo">${e}</span><b>${w}</b><span class="zh">${zh}</span>`,
     en: L ? `Now a word with ${L}: ${w}! Let's trace it.` : `Let's trace ${w}!`,
     zh: L ? `${L}的单词：${zh}，描一描！` : `描一描，${zh}`,
-    doneEn: `${w.toUpperCase().split('').join(', ')}. ${w}!`, doneZh: `${zh}！`
+    doneEn: `${spellOut(w)} ${w}!`, doneZh: `${zh}！`
   };
 }
 // step 0 = big letter, 1 = little letter, 2 = easy word
@@ -2350,7 +2365,7 @@ function numberStep(i, step){
     text: NUM_EN[n], emo: String(n), label: NUM_EN[n],
     hint: `<b>${n}</b><span class="emo">➜</span><b>${NUM_EN[n]}</b><span class="zh">${NUM_ZH[n]}</span>`,
     en: `Now the word ${NUM_EN[n]}! Let's trace it.`, zh: `现在描一描单词 ${NUM_EN[n]}，${NUM_ZH[n]}！`,
-    doneEn: `${NUM_EN[n].toUpperCase().split('').join(', ')}. ${NUM_EN[n]}!`, doneZh: `${NUM_ZH[n]}！`
+    doneEn: `${spellOut(NUM_EN[n])} ${NUM_EN[n]}!`, doneZh: `${NUM_ZH[n]}！`
   };
   return {
     text: String(n), emo: String(n), label: String(n),
@@ -2386,7 +2401,7 @@ function traceScreen(stage, mode){
   let strokes, samples, strokeLetter, chars, cur, p, finished, svg, fillsG, activeG, hintG, inkG, partial, viewBox;
   // write-by-yourself phase
   const WRITE_TIMES = 5;
-  let phase = 'trace', gen = 0, attempt = 0, results = [], writeStrokes = [];
+  let phase = 'trace', gen = 0, attempt = 0, results = [], writeStrokes = [], traceInk = [];
   let best = store.get('trace.best.' + mode, {}); // "idx-step" -> best total stamps (out of 15)
   const soon = (fn, ms) => { const g = gen; later(() => { if (g === gen) fn(); }, ms); };
   const NS = 'http://www.w3.org/2000/svg';
@@ -2469,7 +2484,7 @@ function traceScreen(stage, mode){
       ? [[20,'top'],[60,'mid'],[120,'base']].concat(desc ? [[160,'desc']] : [])
       : [[20,'top'],[70,'mid'],[120,'base']];
     samples = strokes.map(samplePts);
-    cur = 0; p = 0; finished = false; drawing = null;
+    cur = 0; p = 0; finished = false; drawing = null; traceInk = [];
     gen++; phase = 'trace'; writeStrokes = [];
     okBtn.hidden = true; okBtn.classList.remove('ready');
     viewBox = `-22 ${top} ${W + 44} ${bottom - top}`;
@@ -2550,6 +2565,7 @@ function traceScreen(stage, mode){
     const dr = drawing; if (!dr) return;
     if (phase === 'summary' || phase === 'grading') return;
     dr.pts.push(pt);
+    if (phase === 'trace') traceInk.push(pt);
     if (!dr.last){
       dr.d = `M${pt[0].toFixed(1)} ${pt[1].toFixed(1)}`;
       dr.path.setAttribute('d', dr.d + ' l0.01 0');
@@ -2587,18 +2603,44 @@ function traceScreen(stage, mode){
     cur++; p = 0;
     if (cur >= strokes.length) return complete();
     tone([784, 988], 0.07, 'triangle', 0.1);
-    if (letterEnds && chars.length > 1) say(chars[strokeLetter[cur - 1]].toUpperCase(), null);
+    if (letterEnds && chars.length > 1) say(letterName(chars[strokeLetter[cur - 1]]), null);
     drawHint();
+  }
+  // share of his ink that stayed on the dotted path (0..1)
+  function neatness(){
+    const all = [].concat(...samples), R = NEAT_TOL * NEAT_TOL;
+    if (!traceInk.length) return 1;
+    let near = 0;
+    for (const [x, y] of traceInk){
+      for (const [u, v] of all){ if ((x - u) * (x - u) + (y - v) * (y - v) < R){ near++; break; } }
+    }
+    return near / traceInk.length;
   }
   function complete(){
     finished = true;
     activeG.innerHTML = ''; hintG.innerHTML = '';
     svg.classList.add('done');
-    sfx.yay(); addStar(board);
-    const [pe, pz] = pick(PRAISE), it = item();
-    if (!isL || lastStep()) markWrite('word', board);
+    let [pe, pz] = pick(PRAISE); const it = item();
+    const isWord = !isL || lastStep();
+    if (isWord){
+      // words: 0-2 stars for how neatly he traced
+      const neat = neatness(), n = neat >= NEAT_2 ? 2 : neat >= NEAT_1 ? 1 : 0;
+      sfx.yay();
+      for (let i = 0; i < n; i++) flyStar(board, 300 + i * 260);
+      const fx = document.createElement('div'); fx.className = 'neat-fx n' + n;
+      fx.innerHTML = n === 2 ? '⭐⭐ Super neat! <span class="zh">描得真整齐！</span>'
+        : n === 1 ? '⭐ Good! <span class="zh">不错！</span>' : 'Try to stay on the dotted line 尽量描在虚线上';
+      board.appendChild(fx); setTimeout(() => fx.remove(), 2600);
+      if (!n){ pe = 'Nice try!'; pz = '不错的尝试！'; }
+      markWrite('word', board);
+    } else { sfx.yay(); addStar(board); }
     if (!isL){
       say(`${pe} ${it.doneEn}`, `${pz}${it.doneZh}`);
+      const tw = todayLog();
+      if (!(tw.tw || {}).word){
+        const left = WRITE_WORDS - Math.min(tw.twWords || 0, WRITE_WORDS);
+        if (left) later(() => say(`${left} more word${left === 1 ? '' : 's'} today!`, `今天还有${left}个单词！`), 2600);
+      }
       done.add(idx); store.set('trace.done.' + mode, [...done]);
       nextBtn.classList.add('ready');
     } else if (!lastStep()){
