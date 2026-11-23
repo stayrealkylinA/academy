@@ -196,8 +196,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 .mood-card{background:#fff;border-radius:30px;box-shadow:0 7px 0 var(--edge);padding:14px 16px;text-align:center}
 .mood-card h3,.habit-head h3{margin:4px 0 10px;font-size:clamp(20px,3vw,28px)}
 .moods{display:grid;grid-template-columns:repeat(6,1fr);gap:clamp(6px,1.4vw,14px)}
-.mood{background:var(--bg);border-radius:22px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;font-weight:900;font-size:clamp(14px,2vw,18px)}
-.mood span{font-size:clamp(40px,7vw,64px);line-height:1.1}
+.mood{background:var(--bg);border-radius:22px;padding:12px 4px;display:flex;flex-direction:column;align-items:center;font-weight:900;font-size:clamp(14px,2vw,18px)}
+.mood span{font-size:clamp(48px,8.5vw,78px);line-height:1.1}
 .mood small{color:var(--muted);font-size:.85em}
 .mood.on{background:#ffe066;outline:4px solid var(--ink)}
 .mood-reply{font-size:clamp(18px,2.6vw,24px);font-weight:800;margin:10px 0 2px;min-height:1em}
@@ -1270,7 +1270,7 @@ function habits(){
     <main class="stage scroll habits">
       <section class="mood-card">
         <h3>How do you feel today? <span class="zh">今天心情怎么样？</span></h3>
-        <div class="moods">${MOODS.map(m => `<button class="mood chunky" data-m="${m.id}"><span>${m.e}</span>${m.en}<small>${m.zh}</small></button>`).join('')}</div>
+        <div class="moods">${MOODS.map(m => `<button class="mood chunky" data-m="${m.id}" aria-label="${m.en} ${m.zh}"><span>${m.e}</span></button>`).join('')}</div>
         <p class="mood-reply" id="moodReply"></p>
       </section>
       <div class="habit-head">
