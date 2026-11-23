@@ -6,12 +6,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="A's Academy">
+<meta name="apple-mobile-web-app-title" content="A+ Academy">
 <meta name="theme-color" content="#fff8ec">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
-<title>A's Academy</title>
+<title>A+ Academy</title>
 <style>
 :root{
   --ink:#2b2d42; --muted:#6b7280; --bg:#fff8ec; --card:#fff; --edge:#efd6a6;
@@ -358,6 +358,15 @@ img.e3d{width:1.12em;height:1.12em;vertical-align:-.2em;display:inline-block;obj
 .round .ic-e img.e3d{width:34px;height:34px;vertical-align:0}
 .tile-icon img.e3d{width:1.25em;height:1.25em;filter:drop-shadow(0 6px 6px rgba(0,0,0,.18))}
 .tile.wide .tile-icon{font-size:clamp(52px,7vw,80px)}
+/* logo */
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:56px;height:56px;border-radius:14px;box-shadow:0 4px 0 rgba(214,51,108,.25)}
+.logo.sm{width:44px;height:44px;border-radius:11px}
+/* language on screen */
+body.lang-en .L-zh,body.lang-en .zh,body.lang-en .tile-zh{display:none!important}
+body.lang-zh .L-en,body.lang-zh .tile-en{display:none!important}
+body.lang-zh .zh{font-size:inherit;color:inherit;margin-left:0}
+body.lang-zh .tile-zh{font-size:clamp(22px,2.8vw,32px);opacity:1}
 .records{width:min(860px,100%);margin-top:14px;text-align:left}
 .records h3{font-size:clamp(20px,2.8vw,26px);margin:18px 0 8px}
 .rec-wrap{overflow-x:auto;border-radius:20px;box-shadow:0 5px 0 var(--edge)}
@@ -657,10 +666,57 @@ function emojify(root){
     if (frag){ if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last))); n.replaceWith(frag); }
   });
 }
+/* ---------- language on screen ----------
+   EN + 中文: everything. EN: Chinese text hidden. 中文: English labels hidden, but the learning
+   content (words, letters, numbers - anything English without a Chinese partner) stays.
+   Text is marked once (.L-zh = Chinese bit, .L-en = English label); a class on <body> shows/hides. */
+const HAS_CJK = /[㐀-鿿豈-﫿]/, HAS_LAT = /[A-Za-z]/;
+const CJK_RUN = /[㐀-鿿豈-﫿　-〿＀-￯]+/g;
+const LAT_RUN = /[A-Za-z][A-Za-z'’.\-!?,&]*(?:[ \t]+[A-Za-z][A-Za-z'’.\-!?,&]*)*/g;
+const pureZh = el => { const t = el.textContent; return HAS_CJK.test(t) && !HAS_LAT.test(t); };
+function wrapIn(cls, text){ const sp = document.createElement('span'); sp.className = cls; sp.textContent = text; return sp; }
+function splitLatin(frag, text){
+  let last = 0;
+  text.replace(LAT_RUN, (m, off) => {
+    if (off > last) frag.appendChild(document.createTextNode(text.slice(last, off)));
+    frag.appendChild(wrapIn('L-en', m)); last = off + m.length; return m;
+  });
+  if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+}
+function langify(root){
+  if (!root || (root.nodeType !== 1 && root.nodeType !== 11)) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode: n => {
+    const el = n.parentElement;
+    if (!el || EMO_SKIP.has(el.nodeName) || el.closest('svg,.L-en,.L-zh,.no-lang')) return NodeFilter.FILTER_REJECT;
+    return (HAS_CJK.test(n.nodeValue) || HAS_LAT.test(n.nodeValue)) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+  }});
+  const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(n => {
+    const t = n.nodeValue, el = n.parentElement, hz = HAS_CJK.test(t), la = HAS_LAT.test(t);
+    if (hz && la){                       // "today 今日" in one piece: split it
+      const frag = document.createDocumentFragment(); let last = 0;
+      t.replace(CJK_RUN, (m, off) => {
+        if (off > last) splitLatin(frag, t.slice(last, off));
+        frag.appendChild(wrapIn('L-zh', m)); last = off + m.length; return m;
+      });
+      if (last < t.length) splitLatin(frag, t.slice(last));
+      n.replaceWith(frag);
+    } else if (hz){                      // Chinese only
+      n.replaceWith(wrapIn('L-zh', t));
+    } else if ([...el.children].some(pureZh)){   // English label with a Chinese partner next to it
+      n.replaceWith(wrapIn('L-en', t));
+    }
+  });
+}
+function applyLang(){
+  document.body.classList.remove('lang-both', 'lang-en', 'lang-zh');
+  document.body.classList.add('lang-' + lang);
+}
+applyLang();
 new MutationObserver(muts => {
   for (const m of muts) for (const n of m.addedNodes){
-    if (n.nodeType === 1) emojify(n);
-    else if (n.nodeType === 3 && n.parentElement) emojify(n.parentElement);
+    const el = n.nodeType === 1 ? n : (n.nodeType === 3 ? n.parentElement : null);
+    if (el){ langify(el); emojify(el); }
   }
 }).observe(document.documentElement, {childList: true, subtree: true});
 // once, when online: quietly save every picture so the whole app works offline
@@ -929,7 +985,7 @@ function onboarding(redo){
   const ob = Object.assign({name: '', animal: BUDDIES[0], color: AV_COLORS[0], strokes: []}, redo ? me() : null);
   if (redo) ob.strokes = [];
   const frame = (body) => {
-    $app.innerHTML = `<header class="top"><div class="hello"><span>A's Academy ✨</span></div></header><main class="stage onboard">${body}</main>`;
+    $app.innerHTML = `<header class="top"><div class="hello brand"><img src="icons/logo.svg" class="logo" alt=""><span>A+ Academy</span></div></header><main class="stage onboard">${body}</main>`;
   };
   function stepName(){
     frame(`<div class="ob-card"><div class="ob-big">👋</div>
@@ -945,7 +1001,7 @@ function onboarding(redo){
     };
     document.getElementById('obNext').onclick = go;
     inp.onkeydown = e => { if (e.key === 'Enter') go(); };
-    say("Welcome to A's Academy! What's your name?", '欢迎来到A的学院！你叫什么名字？');
+    say("Welcome to A+ Academy! What's your name?", '欢迎来到A+学院！你叫什么名字？');
   }
   function stepBirthday(){
     frame(`<div class="ob-card"><div class="ob-big">🎂</div>
@@ -1141,9 +1197,10 @@ function home(){
   navigate();
   $app.innerHTML = `
     <header class="top">
-      <button class="hello" id="meBtn" aria-label="My profile">${avatarSVG(me())}<span>Hi ${(me() || {}).name || ''}! <span class="zh">你好！</span></span></button>
+      <button class="hello" id="meBtn" aria-label="My profile">${avatarSVG(me())}<span>Hi <span class="nm">${esc((me() || {}).name || '')}</span>! <span class="zh">你好！</span></span></button>
       <div class="right">
-        <button class="pill chunky" id="langBtn" aria-label="Language">${langLabel()}</button>
+        <img src="icons/logo.svg" class="logo sm" alt="A+ Academy">
+        <button class="pill chunky no-lang" id="langBtn" aria-label="Language">${langLabel()}</button>
         <div class="stars">⭐ <b id="starCount">${stars}</b></div>
       </div>
     </header>
@@ -1157,7 +1214,7 @@ function home(){
     </main>`;
   document.getElementById('meBtn').onclick = () => { sfx.pop(); profileMenu(); };
   document.getElementById('langBtn').onclick = e => {
-    lang = {both:'en', en:'zh', zh:'both'}[lang]; store.set('lang', lang);
+    lang = {both:'en', en:'zh', zh:'both'}[lang]; store.set('lang', lang); applyLang();
     e.currentTarget.textContent = langLabel(); sfx.pop();
     say(lang==='zh' ? null : 'English', lang==='en' ? null : '中文');
   };
@@ -1483,7 +1540,7 @@ function syncPanel(){
       ${msg ? `<p class="sync-msg">${msg}</p>` : ''}
       <ol class="sync-help">
         <li><b>Send</b> on this iPad → choose <b>AirDrop</b> → pick the other iPad. 本机点“发送”，选“隔空投送”。</li>
-        <li>On the other iPad: A's Academy → Piggy Bank → 📲 Other iPad → <b>Receive</b> → pick the file (Files → Downloads). 另一台iPad点“接收”，在“文件→下载”里选这个文件。</li>
+        <li>On the other iPad: A+ Academy → Piggy Bank → 📲 Other iPad → <b>Receive</b> → pick the file (Files → Downloads). 另一台iPad点“接收”，在“文件→下载”里选这个文件。</li>
         <li>Do it again any time — it updates, it never counts twice. 可以随时再做一次，不会重复计算。</li>
       </ol>
       <div class="gate-opts"><button class="pill chunky" data-x>Close</button></div></div>`;
@@ -1494,7 +1551,7 @@ function syncPanel(){
     const blob = new Blob([JSON.stringify(exportData())], {type: 'application/json'});
     const file = new File([blob], fname, {type: 'application/json'});
     if (navigator.canShare && navigator.canShare({files: [file]})){
-      try { await navigator.share({files: [file], title: `A's Academy – ${name}`}); return draw('✅ Sent! Now tap Receive on the other iPad. 已发送！'); }
+      try { await navigator.share({files: [file], title: `A+ Academy – ${name}`}); return draw('✅ Sent! Now tap Receive on the other iPad. 已发送！'); }
       catch (e){ if (e.name === 'AbortError') return; }
     }
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname;
@@ -1504,7 +1561,7 @@ function syncPanel(){
   async function receive(f){
     let d;
     try { d = JSON.parse(await f.text()); } catch (_) { d = null; }
-    if (!d || d.app !== 'academy' || !d.devices) return draw("⚠️ That isn't an A's Academy file. 这不是A's Academy的文件。");
+    if (!d || d.app !== 'academy' || !d.devices) return draw("⚠️ That isn't an A+ Academy file. 这不是A+ Academy的文件。");
     const others = Object.keys(d.devices).filter(id => id !== deviceId);
     if (!others.length) return draw('ℹ️ That file came from this iPad. 这个文件来自本机。');
     const after = previewImport(d);
