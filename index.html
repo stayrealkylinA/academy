@@ -282,6 +282,61 @@ input{-webkit-user-select:text;user-select:text}
 .sync-help{font-size:14px;color:var(--muted);padding-left:20px;margin:12px 0}
 .sync-help li{margin:4px 0}
 .sync-msg{font-weight:800;background:#fff3bf;border-radius:14px;padding:8px 12px}
+.kid-cash{width:min(760px,100%);background:#fff;border-radius:30px;box-shadow:0 7px 0 var(--edge);padding:14px 16px;text-align:center;border:4px solid #ffd43b}
+.kid-cash h3{margin:2px 0 4px;font-size:clamp(22px,3.2vw,30px)}
+.kid-cash p{margin:0 0 10px;font-weight:800;font-size:clamp(16px,2.2vw,20px)}
+.kid-cash p .zh,.kid-cash h3 .zh{display:block}
+.bill-pick{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:12px}
+.bill{display:flex;flex-direction:column;align-items:center;font-size:clamp(36px,6vw,54px);line-height:1;background:var(--bg);border-radius:16px;padding:6px 8px;opacity:.45;transition:transform .15s,opacity .15s}
+.bill small{font-size:14px;font-weight:900;color:var(--muted)}
+.bill.on{opacity:1;background:#d3f9d8;transform:translateY(-4px) scale(1.06)}
+.cash-split{display:flex;justify-content:center;gap:clamp(12px,4vw,40px);margin-bottom:12px;font-weight:900;font-size:clamp(17px,2.4vw,22px)}
+.cash-split b{display:block;font-size:1.8em}
+.cash-split .take b{color:#2b8a3e}
+.cash-split .keep b{color:#d6336c}
+.ok-btn[disabled]{opacity:.45;animation:none}
+.goals{width:min(860px,100%);text-align:left}
+.goals h3{font-size:clamp(20px,2.8vw,26px);margin:14px 0 8px}
+.goals h4{font-size:18px;margin:14px 0 6px}
+.goal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(240px,38vw,400px),1fr));gap:10px}
+.goal{display:flex;align-items:center;gap:12px;background:#fff;border-radius:22px;padding:10px 14px;box-shadow:0 5px 0 var(--edge)}
+.goal.reached{background:#fff9db;outline:3px solid #fcc419}
+.goal.completed{background:#ebfbee;outline:none;opacity:.9}
+.g-pic{font-size:clamp(36px,5vw,48px);line-height:1}
+.g-body{flex:1;min-width:0}
+.g-body>b{font-size:clamp(17px,2.3vw,21px);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.g-bar{height:14px;background:#f1e7d6;border-radius:999px;overflow:hidden;margin:6px 0 4px}
+.g-bar div{height:100%;background:linear-gradient(90deg,#69db7c,#2f9e44);border-radius:999px}
+.goal.reached .g-bar div{background:linear-gradient(90deg,#ffd43b,#fab005)}
+.goal.completed .g-bar div{background:linear-gradient(90deg,#69db7c,#2f9e44)}
+.g-body small{color:var(--muted);font-weight:700}
+.g-body small b{color:var(--ink)}
+.goals-h{margin-top:18px}
+.pg-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;text-align:left}
+.pg-row{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:16px;padding:8px 10px;font-weight:800}
+.pg-row span{flex:1}
+.pg-row.reached{background:#fff9db}
+.pg-row .pill{font-size:15px;padding:8px 12px}
+.goal-edit .g-name{width:100%;font:inherit;font-size:20px;font-weight:800;padding:12px 14px;border-radius:16px;border:3px solid var(--edge);margin-bottom:10px}
+.pic-pick{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-bottom:10px}
+.pic-pick button{font-size:30px;border-radius:12px;padding:4px;background:var(--bg)}
+.pic-pick button.on{background:#ffe066;outline:3px solid var(--ink)}
+.goal-edit .gate-amt{font-size:40px;gap:10px}
+.goal-edit .gate-amt .round{width:52px;height:52px;font-size:18px;font-weight:900}
+.card.alloc{width:min(640px,100%)}
+.alloc-left{font-size:clamp(28px,4vw,40px);margin-bottom:10px}
+.alloc-left b{display:block;font-size:20px}
+.alloc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.ab{position:relative}
+.ab-add{width:100%;background:var(--bg);border-radius:20px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:16px}
+.ab-add small{color:var(--muted);font-weight:700}
+.ab.has .ab-add{background:#d3f9d8}
+.ab.full .ab-add{outline:3px solid #fcc419}
+.ab-add i{position:absolute;top:-8px;left:-6px;background:#2f9e44;color:#fff;font-style:normal;font-weight:900;border-radius:999px;padding:2px 8px}
+.ab-minus{position:absolute;top:-8px;right:-6px;width:32px;height:32px;border-radius:50%;background:#fff;box-shadow:0 2px 0 var(--edge);font-size:22px;font-weight:900;color:var(--coral)}
+.alloc-sum{list-style:none;padding:0;margin:0 0 8px;text-align:left}
+.alloc-sum li{display:flex;justify-content:space-between;font-size:20px;font-weight:800;padding:6px 10px;border-bottom:1px solid #f3e7d3}
+.alloc-txt{color:#2b8a3e;font-weight:800}
 .records{width:min(860px,100%);margin-top:14px;text-align:left}
 .records h3{font-size:clamp(20px,2.8vw,26px);margin:18px 0 8px}
 .rec-wrap{overflow-x:auto;border-radius:20px;box-shadow:0 5px 0 var(--edge)}
@@ -1063,8 +1118,10 @@ function bank(){
       <div class="bills">${dollars ? '💵'.repeat(Math.min(dollars, 20)) : ''}</div>
       <div class="meter"><div style="width:${left / STAMPS_PER_DOLLAR * 100}%"></div><span>${left} / ${STAMPS_PER_DOLLAR} ⭐</span></div>
       <div class="bank-next">${STAMPS_PER_DOLLAR - left} more stars for the next dollar!<span class="zh">再得${STAMPS_PER_DOLLAR - left}颗星星，就多一块钱！</span></div>
-      <button class="pill chunky parent-btn" id="cashBtn">👨‍👩‍👦 Parents: cash out<span class="zh">家长兑换</span></button>
+      ${cashDue() ? `<section class="kid-cash" id="kidCash"></section>` : ''}
       <div class="cash-day">${cashDayText()}</div>
+      ${goalsSection()}
+      <button class="pill chunky parent-btn" id="cashBtn">👨‍👩‍👦 Parents: goals & cash-out<span class="zh">家长：目标和兑换设置</span></button>
       <button class="pill chunky parent-btn" id="syncBtn">📲 Other iPad: send / receive<span class="zh">其他iPad：发送 / 接收</span></button>
       ${Object.keys(remotes()).length ? `<div class="cash-day">📲 Includes stars from ${Object.keys(remotes()).length} other iPad${Object.keys(remotes()).length > 1 ? 's' : ''} 包含其他iPad的星星</div>` : ''}
       ${bankRecords(history, paidTotal)}
@@ -1072,6 +1129,44 @@ function bank(){
   document.getElementById('homeBtn').onclick = () => { sfx.pop(); home(); };
   say(`You have ${stars} stars. That's ${dollars} dollar${dollars === 1 ? '' : 's'}!`, `你有${stars}颗星星，是${dollars}块钱！`);
   document.getElementById('cashBtn').onclick = () => { sfx.pop(); parentGate(parentPanel); };
+  // cash-out day: HE decides how many dollars to take; the rest keeps saving
+  const kc = document.getElementById('kidCash');
+  if (kc){
+    const max = Math.min(dollars, 20);
+    let pickN = 0;
+    const draw = () => {
+      if (!dollars){
+        kc.innerHTML = `<h3>🎉 Cash-out day! <span class="zh">今天是兑换日！</span></h3>
+          <p>You need ${STAMPS_PER_DOLLAR} ⭐ for $1. Keep going! <span class="zh">还要${STAMPS_PER_DOLLAR - left}颗星星才有一块钱，加油！</span></p>`;
+        return;
+      }
+      kc.innerHTML = `<h3>🎉 Cash-out day! <span class="zh">今天是兑换日！</span></h3>
+        <p>How many dollars do you want? Tap the money! <span class="zh">你想换多少钱？点一点钱！</span></p>
+        <div class="bill-pick">${Array.from({length: max}, (_, i) =>
+          `<button class="bill ${i < pickN ? 'on' : ''}" data-b="${i + 1}" aria-label="${i + 1} dollars">💵<small>$${i + 1}</small></button>`).join('')}</div>
+        <div class="cash-split">
+          <div class="take">👛 Take 拿走<b>$${pickN}</b></div>
+          <div class="keep">🐷 Keep saving 继续存<b>$${dollars - pickN}</b></div>
+        </div>
+        <button class="ok-btn chunky" id="wantBtn" ${pickN ? '' : 'disabled'}>✅ I want $${pickN}!<span class="zh">请爸爸妈妈确认</span></button>`;
+      kc.querySelectorAll('.bill').forEach(b => b.onclick = () => {
+        const k = +b.dataset.b;
+        pickN = pickN === k ? k - 1 : k;   // tap the last chosen bill again to put it back
+        sfx.pop(); draw();
+        const rest = dollars - pickN;
+        say(`${pickN} dollar${pickN === 1 ? '' : 's'} for you. ${rest} stay${rest === 1 ? 's' : ''} in your piggy bank.`,
+            `拿${pickN}块钱，存钱罐里还留${rest}块。`);
+      });
+      const wb = document.getElementById('wantBtn');
+      if (wb) wb.onclick = () => {
+        if (!pickN) return;
+        sfx.pop();
+        allocate(pickN);
+      };
+    };
+    draw();
+    if (dollars) later(() => say("It's cash-out day! How many dollars do you want?", '今天是兑换日！你想换多少钱？'), 2600);
+  }
   document.getElementById('syncBtn').onclick = () => { sfx.pop(); parentGate(syncPanel); };
 }
 // parents' record: one row per day + every cash-out
@@ -1113,7 +1208,7 @@ function bankRecords(history, paidTotal){
     </table></div>` : '<p class="no">No days recorded yet. 还没有记录。</p>'}
     <h3>💵 Cash-outs <span class="zh">兑换记录</span></h3>
     ${history.length ? `<ul class="cash-list">${history.slice().reverse().map(h =>
-      `<li><span>${new Date(h.t).toLocaleString(undefined, {weekday: 'short', month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit'})}</span><b>$${h.d}</b><span class="no">${h.s || h.d * STAMPS_PER_DOLLAR} ⭐${h.dev ? ` · 📲 ${h.dev}` : ''}</span></li>`).join('')}</ul>`
+      `<li><span>${new Date(h.t).toLocaleString(undefined, {weekday: 'short', month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit'})}</span><b>$${h.d}</b><span class="alloc-txt">${h.alloc ? Object.entries(h.alloc).filter(([, v]) => v).map(([k, v]) => `${k === 'spend' ? '🛍️' : (getGoals().find(g => g.id === k) || {e: '🎯'}).e}$${v}`).join(' ') : ''}</span><span class="no">${h.s || h.d * STAMPS_PER_DOLLAR} ⭐${h.dev ? ` · 📲 ${h.dev}` : ''}</span></li>`).join('')}</ul>`
       : '<p class="no">No cash-outs yet. 还没有兑换。</p>'}
   </section>`;
 }
@@ -1145,22 +1240,29 @@ function cashDayText(){
 function parentPanel(){
   const ov = document.createElement('div'); ov.className = 'overlay';
   const draw = () => {
-    const dollars = Math.floor(stars / STAMPS_PER_DOLLAR), due = cashDue(), cur = cashSched();
+    const cur = cashSched();
     ov.innerHTML = `<div class="card gate">
       <p class="gate-q">Cash-out schedule<br><small>兑换周期</small></p>
       <div class="gate-opts sched">${Object.entries(SCHEDULES).map(([k, v]) =>
         `<button class="pill chunky ${k === cur ? 'on' : ''}" data-s="${k}">${v.en}<span class="zh">${v.zh}</span></button>`).join('')}</div>
       <p class="gate-sub">${cashDayText()}</p>
-      <div class="gate-opts">
-        <button class="pill chunky" data-x>Close</button>
-        ${due && dollars ? `<button class="pill chunky gate-ok" data-cash>Cash out 兑换 ($${dollars})</button>`
-          : `<button class="pill chunky" disabled>${due ? `Need ${STAMPS_PER_DOLLAR} ⭐ for $1` : 'Not cash-out day yet 还没到兑换日'}</button>`}
-      </div></div>`;
+      <p class="gate-sub">On cash-out day he chooses how much to take and which goals it goes to; you confirm and pay.<br>兑换日由孩子决定换多少、放进哪个目标，家长确认后支付。</p>
+      <p class="gate-q goals-h">🎯 Goals<br><small>目标</small></p>
+      <div class="pg-list">${getGoals().filter(g => !g.doneAt).map(g => `<div class="pg-row ${goalReached(g) ? 'reached' : ''}">
+          <span>${g.e} ${esc(g.name)} <b>$${g.saved}/$${g.target}</b></span>
+          ${goalReached(g) ? `<button class="pill chunky gate-ok" data-redeem="${g.id}">Redeem 兑现 🏆</button>` : ''}
+          <button class="pill chunky" data-edit="${g.id}" aria-label="Edit">✏️</button></div>`).join('') || '<p class="no">No goals yet. 还没有目标。</p>'}</div>
+      <div class="gate-opts"><button class="pill chunky" data-newgoal>➕ New goal 新目标</button></div>
+      <div class="gate-opts"><button class="pill chunky gate-ok" data-x>Done 完成</button></div></div>`;
   };
   ov.onclick = e => {
     const sb = e.target.closest('[data-s]');
     if (sb){ store.set('bank.sched', sb.dataset.s); sfx.pop(); draw(); return; }
-    if (e.target.closest('[data-cash]')){ ov.remove(); cashOut(Math.floor(stars / STAMPS_PER_DOLLAR)); return; }
+    if (e.target.closest('[data-newgoal]')){ sfx.pop(); goalEditor(null, draw); return; }
+    const eb = e.target.closest('[data-edit]');
+    if (eb){ sfx.pop(); goalEditor(getGoals().find(g => g.id === eb.dataset.edit), draw); return; }
+    const rb = e.target.closest('[data-redeem]');
+    if (rb){ redeemGoal(rb.dataset.redeem); draw(); return; }
     if (e.target === ov || e.target.closest('[data-x]')){ ov.remove(); bank(); }
   };
   draw(); document.body.appendChild(ov);
@@ -1269,35 +1371,149 @@ function parentGate(onPass){
   };
   document.body.appendChild(ov);
 }
-function cashOut(max){
+function confirmPay(n, alloc = {spend: n}){
   const ov = document.createElement('div'); ov.className = 'overlay';
-  if (!max){
-    ov.innerHTML = `<div class="card gate"><p class="gate-q">Not enough stars yet.<br><small>${STAMPS_PER_DOLLAR} ⭐ are needed for $1 — he has ${stars}.</small></p>
-      <div class="card-nav" style="justify-content:center"><button class="round chunky" data-x>${IC.close}</button></div></div>`;
-    ov.onclick = e => { if (e.target === ov || e.target.closest('[data-x]')) ov.remove(); };
-    return document.body.appendChild(ov);
-  }
-  let n = max;
-  const draw = () => {
-    ov.innerHTML = `<div class="card gate"><p class="gate-q">Cash out how much?</p>
-      <div class="gate-amt"><button class="round chunky" data-d="-1">➖</button><b>$${n}</b><button class="round chunky" data-d="1">➕</button></div>
-      <p class="gate-sub">Uses ${n * STAMPS_PER_DOLLAR} ⭐ · ${stars - n * STAMPS_PER_DOLLAR} ⭐ stay in the bank</p>
-      <div class="gate-opts"><button class="pill chunky" data-x>Cancel</button><button class="pill chunky gate-ok" data-ok>Pay $${n} ✅</button></div></div>`;
-  };
+  const who = ((typeof me === 'function' && me()) || {}).name || 'He';
+  const rest = stars - n * STAMPS_PER_DOLLAR;
+  const lines = Object.entries(alloc).filter(([, v]) => v).map(([k, v]) => {
+    const g = getGoals().find(x => x.id === k);
+    return `<li>${k === 'spend' ? '🛍️ Spend now 现在花' : `${g.e} ${esc(g.name)}`}<b>$${v}</b></li>`;
+  }).join('');
+  ov.innerHTML = `<div class="card gate"><p class="gate-q">${who} wants 💵 $${n}<br><small>孩子想换${n}块钱</small></p>
+    <ul class="alloc-sum">${lines}</ul>
+    <p class="gate-sub">Uses ${n * STAMPS_PER_DOLLAR} ⭐ · ${rest} ⭐ ($${Math.floor(rest / STAMPS_PER_DOLLAR)}) keep saving in the piggy bank</p>
+    <div class="gate-opts"><button class="pill chunky" data-x>Not now 先不</button><button class="pill chunky gate-ok" data-ok>Pay $${n} ✅ 支付</button></div></div>`;
   ov.onclick = e => {
-    const d = e.target.closest('[data-d]');
-    if (d){ n = Math.min(max, Math.max(1, n + +d.dataset.d)); sfx.pop(); draw(); return; }
     if (e.target.closest('[data-ok]')){
       stars -= n * STAMPS_PER_DOLLAR; saveStars();
-      const h = store.get('bank.history', []); h.push({t: Date.now(), d: n, s: n * STAMPS_PER_DOLLAR}); store.set('bank.history', h);
+      const h = store.get('bank.history', []); h.push({t: Date.now(), d: n, s: n * STAMPS_PER_DOLLAR, alloc}); store.set('bank.history', h);
       logToday(e => { e.paid += n; });
+      const goals = getGoals(); let filled = null;
+      goals.forEach(g => { if (alloc[g.id]){ const was = goalReached(g); g.saved += alloc[g.id]; if (!was && goalReached(g)) filled = g; } });
+      setGoals(goals);
       ov.remove(); bank();
-      cheer(`💵 $${n} 🎉`, `Yay! You got ${n} dollar${n === 1 ? '' : 's'}!`, `耶！你得到了${n}块钱！`);
+      cheer(`💵 $${n} 🎉`, `Yay! You got ${n} dollar${n === 1 ? '' : 's'}! Great saving!`, `耶！你得到了${n}块钱！真会存钱！`);
+      if (filled) setTimeout(() => cheer(`🎯 ${filled.e}`, `Your ${filled.name} goal is full! Ask Mom or Dad to redeem it!`, `${filled.name}的目标存满了！请爸爸妈妈兑现！`), 2600);
       return;
     }
     if (e.target === ov || e.target.closest('[data-x]')) ov.remove();
   };
+  document.body.appendChild(ov);
+}
+
+/* ---------- savings goals: parents set them up, he fills them on cash-out day ---------- */
+const GOAL_PICS = ['🧸','🚗','🦖','🚂','🎮','📚','🍦','🎨','⚽','🚲','🎁','🏖️','🐶','🧱','🎈','🛝'];
+const esc = t => String(t).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const getGoals = () => store.get('goals', []);
+const setGoals = g => store.set('goals', g);
+const goalReached = g => g.saved >= g.target;
+
+function goalCard(g){
+  const pct = Math.min(100, Math.round(g.saved / g.target * 100));
+  const status = g.doneAt ? `✅ ${new Date(g.doneAt).toLocaleDateString()}`
+    : goalReached(g) ? '🎉 Reached! Ask Mom or Dad 达成！请爸爸妈妈兑现' : `$${g.target - g.saved} to go 还差${g.target - g.saved}块`;
+  return `<div class="goal ${goalReached(g) ? 'reached' : ''} ${g.doneAt ? 'completed' : ''}">
+    <span class="g-pic">${g.e}</span>
+    <div class="g-body"><b>${esc(g.name)}</b>
+      <div class="g-bar"><div style="width:${pct}%"></div></div>
+      <small><b>$${g.saved} / $${g.target}</b> · ${status}</small>
+    </div></div>`;
+}
+function goalsSection(){
+  const goals = getGoals(), act = goals.filter(g => !g.doneAt), done = goals.filter(g => g.doneAt);
+  return `<section class="goals"><h3>🎯 My goals <span class="zh">我的目标</span></h3>
+    ${act.length ? `<div class="goal-grid">${act.map(goalCard).join('')}</div>`
+      : '<p class="no">No goals yet — set one with Mom or Dad! 和爸爸妈妈一起定个目标吧！</p>'}
+    ${done.length ? `<h4>🏆 Completed <span class="zh">已完成</span></h4><div class="goal-grid">${done.slice().reverse().map(goalCard).join('')}</div>` : ''}
+  </section>`;
+}
+// parent: add / edit / delete a goal
+function goalEditor(g, onDone){
+  const ov = document.createElement('div'); ov.className = 'overlay';
+  let name = g ? g.name : '', pic = g ? g.e : GOAL_PICS[0], target = g ? g.target : 10, delArmed = false;
+  const draw = () => {
+    ov.innerHTML = `<div class="card gate goal-edit">
+      <p class="gate-q">${g ? 'Edit goal' : 'New goal'}<br><small>${g ? '修改目标' : '新目标'}</small></p>
+      <input class="g-name" maxlength="30" placeholder="e.g. Lego fire truck 例如：乐高消防车" value="${esc(name)}">
+      <div class="pic-pick">${GOAL_PICS.map(e => `<button class="${e === pic ? 'on' : ''}" data-p="${e}">${e}</button>`).join('')}</div>
+      <div class="gate-amt"><button class="round chunky" data-d="-5">−5</button><button class="round chunky" data-d="-1">−1</button><b>$${target}</b><button class="round chunky" data-d="1">+1</button><button class="round chunky" data-d="5">+5</button></div>
+      <div class="gate-opts">
+        ${g ? `<button class="pill chunky" data-del>${delArmed ? 'Tap again to delete 再点一次删除' : '🗑 Delete 删除'}</button>` : ''}
+        <button class="pill chunky" data-x>Cancel 取消</button>
+        <button class="pill chunky gate-ok" data-save>Save 保存</button></div></div>`;
+    const inp = ov.querySelector('.g-name');
+    inp.oninput = () => { name = inp.value; };
+  };
+  ov.onclick = e => {
+    const pb = e.target.closest('[data-p]'), db = e.target.closest('[data-d]');
+    if (pb){ pic = pb.dataset.p; sfx.pop(); draw(); return; }
+    if (db){ target = Math.max(1, Math.min(500, target + +db.dataset.d)); sfx.pop(); draw(); return; }
+    if (e.target.closest('[data-save]')){
+      if (!name.trim()){ ov.querySelector('.g-name').focus(); return; }
+      const goals = getGoals();
+      if (g){ Object.assign(goals.find(x => x.id === g.id), {name: name.trim(), e: pic, target}); }
+      else goals.push({id: 'g' + Date.now().toString(36), name: name.trim(), e: pic, target, saved: 0, createdAt: Date.now()});
+      setGoals(goals); sfx.yay(); ov.remove(); onDone(); return;
+    }
+    if (e.target.closest('[data-del]')){
+      if (!delArmed){ delArmed = true; draw(); return; }
+      setGoals(getGoals().filter(x => x.id !== g.id)); ov.remove(); onDone(); return;
+    }
+    if (e.target === ov || e.target.closest('[data-x]')) ov.remove();
+  };
   draw(); document.body.appendChild(ov);
+}
+// parent: a reached goal is redeemed (bought / given) and becomes Completed
+function redeemGoal(id){
+  const goals = getGoals(), g = goals.find(x => x.id === id);
+  if (!g || !goalReached(g)) return;
+  g.doneAt = Date.now(); setGoals(goals);
+  logToday(e => { e.goalsDone = (e.goalsDone || []).concat(`${g.e} ${g.name}`); });
+  cheer(`🏆 ${g.e}`, `Goal complete! You got your ${g.name}! You saved for it yourself!`, `目标完成！你得到了${g.name}！是你自己存钱换来的！`);
+}
+// cash-out day, step 2: he puts each dollar into a goal jar or "spend now"
+function allocate(n){
+  const goals = getGoals().filter(g => !g.doneAt && !goalReached(g));
+  const ask = alloc => { say('Ask Mommy or Daddy to say yes!', '请爸爸妈妈确认！'); parentGate(() => confirmPay(n, alloc)); };
+  if (!goals.length) return ask({spend: n});
+  const alloc = {};
+  const buckets = [...goals, {id: 'spend', e: '🛍️', name: 'Spend now', zh: '现在花'}];
+  const placed = () => Object.values(alloc).reduce((a, b) => a + b, 0);
+  const ov = document.createElement('div'); ov.className = 'overlay';
+  const draw = () => {
+    const left = n - placed();
+    ov.innerHTML = `<div class="card gate alloc">
+      <p class="gate-q">Where does your money go?<br><small>你的钱要放到哪里？</small></p>
+      <div class="alloc-left">${left ? '💵'.repeat(left) : '✅'} <b>${left ? `$${left} left 还剩` : 'All placed! 都放好了！'}</b></div>
+      <div class="alloc-grid">${buckets.map(b => {
+        const a = alloc[b.id] || 0;
+        const info = b.id === 'spend' ? `$${a}` : `$${b.saved + a} / $${b.target}`;
+        const full = b.id !== 'spend' && b.saved + a >= b.target;
+        return `<div class="ab ${a ? 'has' : ''} ${full ? 'full' : ''}">
+          <button class="ab-add chunky" data-a="${b.id}"><span class="g-pic">${b.e}</span><b>${esc(b.name)}</b>${b.zh ? `<small>${b.zh}</small>` : ''}<small>${info}${full ? ' · full 满了' : ''}</small>${a ? `<i>+$${a}</i>` : ''}</button>
+          ${a ? `<button class="ab-minus" data-m="${b.id}" aria-label="Take one back">−</button>` : ''}</div>`;
+      }).join('')}</div>
+      <div class="gate-opts"><button class="pill chunky" data-x>Back 返回</button>
+        <button class="ok-btn chunky" data-done ${left ? 'disabled' : ''}>✅ Done! 好了</button></div></div>`;
+  };
+  ov.onclick = e => {
+    const ab = e.target.closest('[data-a]'), mb = e.target.closest('[data-m]');
+    if (ab){
+      const b = buckets.find(x => x.id === ab.dataset.a), a = alloc[b.id] || 0;
+      if (n - placed() <= 0) return say('All your money is placed!', '钱都放好了！');
+      if (b.id !== 'spend' && b.saved + a >= b.target) return say(`${b.name} is full!`, `${b.name}已经满了！`);
+      alloc[b.id] = a + 1; sfx.pop(); draw();
+      if (b.id === 'spend') say('One dollar to spend now!', '一块钱现在花！');
+      else if (b.saved + a + 1 >= b.target) say(`One dollar for ${b.name}. Now it's full! You did it!`, `一块钱放进${b.name}，满了！你做到了！`);
+      else say(`One dollar for ${b.name}!`, `一块钱放进${b.name}！`);
+      return;
+    }
+    if (mb){ alloc[mb.dataset.m] = Math.max(0, (alloc[mb.dataset.m] || 0) - 1); sfx.pop(); draw(); return; }
+    if (e.target.closest('[data-done]')){ if (n - placed() > 0) return; ov.remove(); ask(alloc); return; }
+    if (e.target === ov || e.target.closest('[data-x]')) ov.remove();
+  };
+  draw(); document.body.appendChild(ov);
+  say(`You have ${n} dollar${n === 1 ? '' : 's'}. Tap where each dollar goes!`, `你有${n}块钱，点一点，把每块钱放到哪里？`);
 }
 
 /* ---------- module shell ---------- */
