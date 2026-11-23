@@ -384,7 +384,8 @@ img.e3d{width:1.12em;height:1.12em;vertical-align:-.2em;display:inline-block;obj
 .gate-ok{background:#40c057;color:#fff}
 
 /* words + daily games */
-.tile{position:relative}
+.tile{position:relative;border:3px solid var(--d)}
+.tile .badge{box-shadow:0 0 0 2px var(--d)}
 .badge{position:absolute;top:12px;right:12px;background:#fff;color:var(--coral);font-size:clamp(13px,1.8vw,18px);font-weight:900;padding:5px 12px;border-radius:999px;animation:breathe 1.4s ease-in-out infinite}
 .badge.done{color:#2b8a3e;animation:none}
 .cell{position:relative}
@@ -692,12 +693,12 @@ const TILE_COLORS = ['#ff6b6b','#3b9cf0','#f59f00','#37b24d','#9775fa','#f06595'
 const PRAISE = [['Great job!','真棒！'],['Yes! You got it!','对了！'],['Super!','太厉害了！'],['Well done!','做得好！'],['Awesome!','好极了！']];
 
 const MODULES = [
-  {id:'trace', en:'Trace & Write', zh:'描红写字', icon:'✏️', c:'#9775fa', d:'#6f4bd8',
+  {id:'trace', en:'Trace & Write', zh:'描红写字', icon:'✏️', c:'#efe9ff', d:'#d0bfff', t:'#5f3dc4',
    modes:[['letters','🔤 Letters','字母'],['numbers','🔢 Numbers','数字'],['words','📝 Words','单词']]},
-  {id:'words',   en:'Words', zh:'单词', icon:'📚', c:'#ff6b6b', d:'#d94848'},
-  {id:'math',    en:'Math', zh:'数学', icon:'🧮', c:'#40c057', d:'#2b8a3e', learn:false},
-  {id:'habits',  en:'Habits & Feelings', zh:'好习惯和心情', icon:'😊', c:'#20c997', d:'#0ca678'},
-  {id:'bank',    en:'Piggy Bank', zh:'存钱罐', icon:'🐷', c:'#f783ac', d:'#d6336c', wide:true},
+  {id:'words',   en:'Words', zh:'单词', icon:'📚', c:'#fff0ee', d:'#ffc9c9', t:'#c92a2a'},
+  {id:'math',    en:'Math', zh:'数学', icon:'🧮', c:'#ebfbee', d:'#b2f2bb', t:'#2b8a3e', learn:false},
+  {id:'habits',  en:'Habits & Feelings', zh:'好习惯和心情', icon:'😊', c:'#e6fcf5', d:'#96f2d7', t:'#087f5b'},
+  {id:'bank',    en:'Piggy Bank', zh:'存钱罐', icon:'🐷', c:'#fff0f6', d:'#fcc2d7', t:'#a61e4d', wide:true},
 ];
 const STAMPS_PER_DOLLAR = 50;
 
