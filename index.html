@@ -337,6 +337,19 @@ input{-webkit-user-select:text;user-select:text}
 .alloc-sum{list-style:none;padding:0;margin:0 0 8px;text-align:left}
 .alloc-sum li{display:flex;justify-content:space-between;font-size:20px;font-weight:800;padding:6px 10px;border-bottom:1px solid #f3e7d3}
 .alloc-txt{color:#2b8a3e;font-weight:800}
+.prof-manage{width:min(620px,100%)}
+.pm-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px;text-align:left}
+.pm-row{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:18px;padding:8px 10px;flex-wrap:wrap}
+.pm-row.stale{opacity:.6}
+.pm-row .avatar.sm{width:52px;height:52px;flex:none}
+.pm-row span.avatar.sm{font-size:40px;display:grid;place-items:center}
+.pm-info{flex:1;min-width:150px;font-size:18px}
+.pm-info i{color:#2b8a3e;font-style:normal;font-size:.8em;font-weight:800}
+.pm-info small{display:block;color:var(--muted);font-weight:700;font-size:13px}
+.pm-row .pill{font-size:15px;padding:8px 12px}
+.pm-row.confirm{background:#fff5f5;outline:3px solid #ffa8a8}
+.pm-q{flex:1 1 100%;font-weight:800;font-size:15px}
+.pm-del{background:#fa5252;color:#fff}
 .records{width:min(860px,100%);margin-top:14px;text-align:left}
 .records h3{font-size:clamp(20px,2.8vw,26px);margin:18px 0 8px}
 .rec-wrap{overflow-x:auto;border-radius:20px;box-shadow:0 5px 0 var(--edge)}
@@ -928,7 +941,8 @@ function profileMenu(){
   ov.innerHTML = `<div class="card gate prof-menu"><p class="gate-q">Who's learning?<br><small>谁在学习？</small></p>
     <div class="prof-list">${ids.map(id => { const pr = raw.get(id + '.profile'); return `<button class="prof chunky ${id === profileId ? 'on' : ''}" data-id="${id}">${avatarSVG(pr)}<span>${pr ? pr.name : '…'}</span></button>`; }).join('')}
       <button class="prof chunky add" data-add>➕<span>Add a kid 添加</span></button></div>
-    <div class="gate-opts"><button class="pill chunky" data-redo>✏️ New avatar 重画头像</button><button class="pill chunky" data-x>Close</button></div></div>`;
+    <div class="gate-opts"><button class="pill chunky" data-redo>✏️ New avatar 重画头像</button>
+      <button class="pill chunky" data-manage>🗑 Remove a kid 删除账号</button><button class="pill chunky" data-x>Close</button></div></div>`;
   ov.onclick = e => {
     const b = e.target.closest('[data-id]');
     if (b){ sfx.pop(); if (b.dataset.id !== profileId){ raw.set('academy.current', b.dataset.id); location.reload(); } else ov.remove(); return; }
@@ -938,9 +952,63 @@ function profileMenu(){
       raw.set('academy.profiles', [...ids, id]); raw.set('academy.current', id); location.reload(); return;
     }
     if (e.target.closest('[data-redo]')){ sfx.pop(); ov.remove(); onboarding(true); return; }
+    if (e.target.closest('[data-manage]')){ sfx.pop(); ov.remove(); parentGate(manageKids); return; }
     if (e.target === ov || e.target.closest('[data-x]')) ov.remove();
   };
   document.body.appendChild(ov);
+}
+/* parent: see every account on this iPad and delete the ones not in use */
+function kidInfo(id){
+  const log = raw.get(id + '.daylog') || {}, days = Object.keys(log).sort();
+  return {pr: raw.get(id + '.profile'), stars: raw.get(id + '.stars') || 0, last: days[days.length - 1] || null, daysUsed: days.length};
+}
+function lastUsedText(last){
+  if (!last) return 'never used 从未使用';
+  const d = Math.round((new Date(isoDay()) - new Date(last)) / 86400000);
+  return d <= 0 ? 'used today 今天用过' : d === 1 ? 'last used yesterday 昨天用过' : `last used ${d} days ago ${d}天前用过`;
+}
+function deleteKid(id){
+  const pre = id + '.';
+  try { Object.keys(localStorage).filter(k => k.startsWith(pre)).forEach(k => localStorage.removeItem(k)); } catch(e){}
+  Object.keys(memStore).filter(k => k.startsWith(pre)).forEach(k => delete memStore[k]);
+  const rest = (raw.get('academy.profiles') || []).filter(x => x !== id);
+  raw.set('academy.profiles', rest);
+  if (id === profileId) raw.set('academy.current', rest[0] || ('kid' + Date.now()));
+  return id === profileId || !rest.length;   // true: the app has to restart
+}
+function manageKids(){
+  const ov = document.createElement('div'); ov.className = 'overlay';
+  let confirmId = null;
+  const draw = () => {
+    const ids = profileIds();
+    ov.innerHTML = `<div class="card gate prof-manage"><p class="gate-q">Kids on this iPad<br><small>这台iPad上的账号</small></p>
+      <div class="pm-list">${ids.map(id => {
+        const k = kidInfo(id), stale = !k.pr || !k.last || (new Date(isoDay()) - new Date(k.last)) / 86400000 > 30;
+        const name = k.pr ? esc(k.pr.name) : 'Not set up 未设置';
+        if (id === confirmId) return `<div class="pm-row confirm">
+          <span class="pm-q">${k.pr ? `Delete <b>${name}</b> and all of their ⭐ ${k.stars} stars, records and goals? This can't be undone.<br>删除${name}和所有星星、记录、目标？无法恢复。`
+            : `Delete this unfinished account? 删除这个未设置的账号？`}</span>
+          <button class="pill chunky" data-cancel>Cancel 取消</button><button class="pill chunky pm-del" data-really="${id}">Delete forever 永久删除</button></div>`;
+        return `<div class="pm-row ${stale ? 'stale' : ''}">${avatarSVG(k.pr, 'avatar sm')}
+          <span class="pm-info"><b>${name}</b>${id === profileId ? ' <i>· using now 正在使用</i>' : ''}<small>⭐ ${k.stars} · ${lastUsedText(k.last)}${k.daysUsed ? ` · ${k.daysUsed} day${k.daysUsed === 1 ? '' : 's'} 天` : ''}</small></span>
+          <button class="pill chunky" data-del="${id}">🗑 Delete 删除</button></div>`;
+      }).join('')}</div>
+      <p class="gate-sub">Faded rows haven't been used for 30+ days (or were never set up). 浅色的账号超过30天没用或未设置。</p>
+      <div class="gate-opts"><button class="pill chunky gate-ok" data-x>Done 完成</button></div></div>`;
+  };
+  ov.onclick = e => {
+    const d = e.target.closest('[data-del]'), r = e.target.closest('[data-really]');
+    if (d){ confirmId = d.dataset.del; sfx.pop(); draw(); return; }
+    if (e.target.closest('[data-cancel]')){ confirmId = null; sfx.pop(); draw(); return; }
+    if (r){
+      const restart = deleteKid(r.dataset.really);
+      sfx.pop();
+      if (restart){ location.reload(); return; }
+      confirmId = null; draw(); return;
+    }
+    if (e.target === ov || e.target.closest('[data-x]')){ ov.remove(); home(); }
+  };
+  draw(); document.body.appendChild(ov);
 }
 // the kid's own name is the first word to trace
 function applyName(){
