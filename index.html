@@ -367,6 +367,10 @@ body.lang-en .L-zh,body.lang-en .zh,body.lang-en .tile-zh{display:none!important
 body.lang-zh .L-en,body.lang-zh .tile-en{display:none!important}
 body.lang-zh .zh{font-size:inherit;color:inherit;margin-left:0}
 body.lang-zh .tile-zh{font-size:clamp(22px,2.8vw,32px);opacity:1}
+/* home button = the A+ Academy logo */
+#homeBtn{background:none;box-shadow:none;width:64px;height:64px}
+#homeBtn .home-logo{width:60px;height:60px;border-radius:16px;display:block;box-shadow:0 5px 0 rgba(214,51,108,.3)}
+#homeBtn:active .home-logo{box-shadow:0 1px 0 rgba(214,51,108,.3)}
 .records{width:min(860px,100%);margin-top:14px;text-align:left}
 .records h3{font-size:clamp(20px,2.8vw,26px);margin:18px 0 8px}
 .rec-wrap{overflow-x:auto;border-radius:20px;box-shadow:0 5px 0 var(--edge)}
@@ -631,7 +635,7 @@ const sfx = {
 /* ---------- icons: emoji, shown as Fluent 3D pictures by the swapper below ---------- */
 const icE = e => `<span class="ic-e" aria-hidden="true">${e}</span>`;
 const IC = {
-  home: icE('🏠'), speak: icE('🔊'), prev: icE('◀️'), next: icE('▶️'), erase: icE('🧽'),
+  home: '<img src="icons/logo.svg" class="home-logo" alt="">', speak: icE('🔊'), prev: icE('◀️'), next: icE('▶️'), erase: icE('🧽'),
   grid: icE('🔤'), close: icE('✖️'), mic: icE('🎤'), bulb: icE('💡'),
   spell: '<span class="ic-txt">a·b·c</span>',
 };
