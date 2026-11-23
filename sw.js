@@ -1,6 +1,6 @@
 // Keeps the app working offline. Shows the saved copy right away and
 // quietly fetches the newest version in the background for next time.
-const CACHE = 'academy-v6';
+const CACHE = 'academy-v7';
 const FILES = ['./', './index.html', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 

@@ -350,6 +350,9 @@ input{-webkit-user-select:text;user-select:text}
 .pm-row.confirm{background:#fff5f5;outline:3px solid #ffa8a8}
 .pm-q{flex:1 1 100%;font-weight:800;font-size:15px}
 .pm-del{background:#fa5252;color:#fff}
+.bday-pick{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.bday-pick label{display:flex;flex-direction:column;gap:4px;font-weight:900;font-size:16px;color:var(--muted)}
+.bday-pick select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);padding:10px 12px;border-radius:16px;border:3px solid var(--edge);background:#fff;min-width:96px}
 .records{width:min(860px,100%);margin-top:14px;text-align:left}
 .records h3{font-size:clamp(20px,2.8vw,26px);margin:18px 0 8px}
 .rec-wrap{overflow-x:auto;border-radius:20px;box-shadow:0 5px 0 var(--edge)}
@@ -837,6 +840,66 @@ function nameWord(n){
   return w.length >= 2 && w.length <= 10 ? w[0].toUpperCase() + w.slice(1).toLowerCase() : null;
 }
 
+/* ---------- birthday: year / month / day ---------- */
+const MONTHS = [['Jan','一月'],['Feb','二月'],['Mar','三月'],['Apr','四月'],['May','五月'],['Jun','六月'],
+                ['Jul','七月'],['Aug','八月'],['Sep','九月'],['Oct','十月'],['Nov','十一月'],['Dec','十二月']];
+function birthdayPicker(bd){
+  const [y, m, d] = (bd || '').split('-').map(Number), now = new Date().getFullYear();
+  const opt = (v, label, sel) => `<option value="${v}" ${sel ? 'selected' : ''}>${label}</option>`;
+  return `<div class="bday-pick">
+    <label>Year 年<select id="bdY">${opt('', '—', !y)}${Array.from({length: 16}, (_, i) => now - i).map(v => opt(v, v, v === y)).join('')}</select></label>
+    <label>Month 月<select id="bdM">${opt('', '—', !m)}${MONTHS.map(([en, zh], i) => opt(i + 1, `${i + 1} · ${en} ${zh}`, i + 1 === m)).join('')}</select></label>
+    <label>Day 日<select id="bdD">${opt('', '—', !d)}${Array.from({length: 31}, (_, i) => opt(i + 1, i + 1, i + 1 === d)).join('')}</select></label>
+  </div>`;
+}
+// read the picker: 'YYYY-MM-DD', or null if something is missing / not a real date (e.g. Feb 30)
+function readBirthday(){
+  const y = +document.getElementById('bdY').value, m = +document.getElementById('bdM').value, d = +document.getElementById('bdD').value;
+  if (!y || !m || !d) return null;
+  const dt = new Date(y, m - 1, d);
+  if (dt.getMonth() !== m - 1 || dt > new Date()) return null;
+  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+function ageOf(bd){
+  if (!bd) return null;
+  const [y, m, d] = bd.split('-').map(Number), now = new Date();
+  return now.getFullYear() - y - ((now.getMonth() + 1 < m || (now.getMonth() + 1 === m && now.getDate() < d)) ? 1 : 0);
+}
+const bdayText = bd => { if (!bd) return ''; const [y, m, d] = bd.split('-').map(Number); return `${MONTHS[m - 1][0]} ${d}, ${y} · ${ageOf(bd)} yrs ${ageOf(bd)}岁`; };
+// ask (or change) the birthday of the kid using the app
+function birthdayAsk(onDone){
+  const pr = me(); if (!pr) return;
+  const ov = document.createElement('div'); ov.className = 'overlay';
+  ov.innerHTML = `<div class="card gate"><div class="ob-big">🎂</div>
+    <p class="gate-q">When is ${esc(pr.name)}'s birthday?<br><small>${esc(pr.name)}的生日是哪天？</small></p>
+    ${birthdayPicker(pr.birthday)}
+    <p class="gate-sub bd-err" hidden>Please pick the year, month and day. 请选择年、月、日。</p>
+    <div class="gate-opts"><button class="pill chunky" data-x>Later 以后再说</button><button class="pill chunky gate-ok" data-save>Save 保存</button></div></div>`;
+  ov.onclick = e => {
+    if (e.target.closest('[data-save]')){
+      const b = readBirthday();
+      if (!b){ sfx.oops(); ov.querySelector('.bd-err').hidden = false; return; }
+      store.set('profile', Object.assign({}, me(), {birthday: b}));
+      sfx.yay(); ov.remove(); say(`Thank you! ${pr.name} is ${ageOf(b)} years old!`, `谢谢！${pr.name}${ageOf(b)}岁啦！`);
+      onDone && onDone(); return;
+    }
+    if (e.target === ov || e.target.closest('[data-x]')) ov.remove();
+  };
+  document.body.appendChild(ov);
+  say(`When is ${pr.name}'s birthday?`, `${pr.name}的生日是哪天？`);
+}
+let birthdayAsked = false;
+// on the home screen: ask once if the birthday is missing; celebrate on the day
+function birthdayCheck(){
+  const pr = me(); if (!pr) return;
+  if (!pr.birthday){ if (!birthdayAsked){ birthdayAsked = true; later(() => birthdayAsk(), 900); } return; }
+  const [, m, d] = pr.birthday.split('-').map(Number), now = new Date();
+  if (m === now.getMonth() + 1 && d === now.getDate() && store.get('bday.cheered') !== now.getFullYear()){
+    store.set('bday.cheered', now.getFullYear());
+    later(() => cheer(`🎂 ${ageOf(pr.birthday)} 🎉`, `Happy birthday, ${pr.name}! You are ${ageOf(pr.birthday)} years old today!`, `${pr.name}，生日快乐！你今天${ageOf(pr.birthday)}岁啦！`), 900);
+  }
+}
+
 /* first-time setup */
 function onboarding(redo){
   navigate();
@@ -855,11 +918,27 @@ function onboarding(redo){
     const go = () => {
       const v = inp.value.trim();
       if (!v){ sfx.oops(); inp.focus(); return say('Please type your name.', '请输入名字。'); }
-      ob.name = v; sfx.pop(); stepBuddy();
+      ob.name = v; sfx.pop(); stepBirthday();
     };
     document.getElementById('obNext').onclick = go;
     inp.onkeydown = e => { if (e.key === 'Enter') go(); };
     say("Welcome to A's Academy! What's your name?", '欢迎来到A的学院！你叫什么名字？');
+  }
+  function stepBirthday(){
+    frame(`<div class="ob-card"><div class="ob-big">🎂</div>
+      <p class="big-txt">When is your birthday?<span class="zh">你的生日是哪天？</span></p>
+      ${birthdayPicker(ob.birthday)}
+      <p class="sub-txt bd-err" hidden>Please pick the year, month and day. 请选择年、月、日。</p>
+      <p class="sub-txt">Mom or Dad can help 爸爸妈妈帮忙选</p>
+      <button class="ok-btn chunky" id="obNext">Next 下一步 ➜</button></div>`);
+    document.getElementById('obNext').onclick = () => {
+      const b = readBirthday();
+      if (!b){ sfx.oops(); document.querySelector('.bd-err').hidden = false; return say('Please pick your birthday.', '请选择你的生日。'); }
+      ob.birthday = b; sfx.pop();
+      say(`You are ${ageOf(b)} years old!`, `你${ageOf(b)}岁啦！`);
+      stepBuddy();
+    };
+    say(`When is your birthday, ${ob.name}?`, `${ob.name}，你的生日是哪天？`);
   }
   function stepBuddy(){
     frame(`<div class="ob-card wide">
@@ -918,7 +997,7 @@ function onboarding(redo){
     frame(`<div class="ob-card"><div class="making">✨🎨✨</div><p class="big-txt">Making your avatar…<span class="zh">正在做你的头像…</span></p></div>`);
     say('Making your avatar!', '正在做你的头像！');
     later(() => {
-      const pr = {name: ob.name, animal: ob.animal, color: ob.color, strokes: ob.strokes};
+      const pr = {name: ob.name, birthday: ob.birthday, animal: ob.animal, color: ob.color, strokes: ob.strokes};
       store.set('profile', pr);
       raw.set('academy.profiles', profileIds());
       frame(`<div class="ob-card reveal">${avatarSVG(pr, 'avatar big')}
@@ -942,6 +1021,7 @@ function profileMenu(){
     <div class="prof-list">${ids.map(id => { const pr = raw.get(id + '.profile'); return `<button class="prof chunky ${id === profileId ? 'on' : ''}" data-id="${id}">${avatarSVG(pr)}<span>${pr ? pr.name : '…'}</span></button>`; }).join('')}
       <button class="prof chunky add" data-add>➕<span>Add a kid 添加</span></button></div>
     <div class="gate-opts"><button class="pill chunky" data-redo>✏️ New avatar 重画头像</button>
+      <button class="pill chunky" data-bday>🎂 Birthday 生日</button>
       <button class="pill chunky" data-manage>🗑 Remove a kid 删除账号</button><button class="pill chunky" data-x>Close</button></div></div>`;
   ov.onclick = e => {
     const b = e.target.closest('[data-id]');
@@ -953,6 +1033,7 @@ function profileMenu(){
     }
     if (e.target.closest('[data-redo]')){ sfx.pop(); ov.remove(); onboarding(true); return; }
     if (e.target.closest('[data-manage]')){ sfx.pop(); ov.remove(); parentGate(manageKids); return; }
+    if (e.target.closest('[data-bday]')){ sfx.pop(); ov.remove(); birthdayAsk(); return; }
     if (e.target === ov || e.target.closest('[data-x]')) ov.remove();
   };
   document.body.appendChild(ov);
@@ -990,7 +1071,7 @@ function manageKids(){
             : `Delete this unfinished account? 删除这个未设置的账号？`}</span>
           <button class="pill chunky" data-cancel>Cancel 取消</button><button class="pill chunky pm-del" data-really="${id}">Delete forever 永久删除</button></div>`;
         return `<div class="pm-row ${stale ? 'stale' : ''}">${avatarSVG(k.pr, 'avatar sm')}
-          <span class="pm-info"><b>${name}</b>${id === profileId ? ' <i>· using now 正在使用</i>' : ''}<small>⭐ ${k.stars} · ${lastUsedText(k.last)}${k.daysUsed ? ` · ${k.daysUsed} day${k.daysUsed === 1 ? '' : 's'} 天` : ''}</small></span>
+          <span class="pm-info"><b>${name}</b>${id === profileId ? ' <i>· using now 正在使用</i>' : ''}<small>${k.pr && k.pr.birthday ? `🎂 ${bdayText(k.pr.birthday)} · ` : ''}⭐ ${k.stars} · ${lastUsedText(k.last)}${k.daysUsed ? ` · ${k.daysUsed} day${k.daysUsed === 1 ? '' : 's'} 天` : ''}</small></span>
           <button class="pill chunky" data-del="${id}">🗑 Delete 删除</button></div>`;
       }).join('')}</div>
       <p class="gate-sub">Faded rows haven't been used for 30+ days (or were never set up). 浅色的账号超过30天没用或未设置。</p>
@@ -1066,6 +1147,7 @@ function home(){
     if (m.id === 'math') return mathHome();
     openModule(m, store.get('trace.mode', m.modes[0][0]));
   });
+  birthdayCheck();
 }
 
 /* ---------- HABITS & FEELINGS: daily mood + habits a parent ticks ---------- */
