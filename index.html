@@ -275,6 +275,13 @@ input{-webkit-user-select:text;user-select:text}
 .prof .avatar{width:72px;height:72px}
 .prof.add{font-size:40px;justify-content:center}
 .prof.add span{font-size:15px}
+.sync{width:min(560px,100%);text-align:left}
+.sync .gate-q,.sync .gate-opts{text-align:center}
+.sync-list{background:var(--bg);border-radius:18px;padding:12px 16px;display:flex;flex-direction:column;gap:6px;font-weight:700;margin-bottom:12px}
+.sync-total{font-weight:900;color:#2b8a3e;border-top:2px dashed #e9dcc3;padding-top:6px}
+.sync-help{font-size:14px;color:var(--muted);padding-left:20px;margin:12px 0}
+.sync-help li{margin:4px 0}
+.sync-msg{font-weight:800;background:#fff3bf;border-radius:14px;padding:8px 12px}
 .records{width:min(860px,100%);margin-top:14px;text-align:left}
 .records h3{font-size:clamp(20px,2.8vw,26px);margin:18px 0 8px}
 .rec-wrap{overflow-x:auto;border-radius:20px;box-shadow:0 5px 0 var(--edge)}
@@ -389,7 +396,35 @@ const store = {
   set(k, v){ raw.set(profileId + '.' + k, v); }
 };
 const me = () => store.get('profile', null);   // {name, animal, color, strokes}
-let stars = store.get('stars', 0);
+/* stars from other iPads (moved by AirDrop) are kept as one snapshot per iPad,
+   so sending again replaces the old snapshot instead of counting it twice */
+const deviceId = raw.get('academy.device') || (() => { const id = Math.random().toString(36).slice(2, 6).toUpperCase(); raw.set('academy.device', id); return id; })();
+const remotes = () => store.get('remotes', {});   // deviceId -> {at, stars, daylog, history}
+const remoteStars = () => Object.values(remotes()).reduce((a, r) => a + (r.stars || 0), 0);
+const maxN = (x, y) => x == null ? y : y == null ? x : Math.max(x, y);
+function mergeDay(a, b){
+  if (!a) return JSON.parse(JSON.stringify(b)); if (!b) return a;
+  const time = Object.assign({}, a.time); Object.entries(b.time || {}).forEach(([k, v]) => { time[k] = (time[k] || 0) + v; });
+  const bonus = Object.assign({}, a.bonus); Object.entries(b.bonus || {}).forEach(([k, v]) => { bonus[k] = (bonus[k] || 0) + v; });
+  return {stars: (a.stars || 0) + (b.stars || 0), trace: (a.trace || 0) + (b.trace || 0),
+    words: maxN(a.words, b.words), math: maxN(a.math, b.math), paid: (a.paid || 0) + (b.paid || 0),
+    habits: [...new Set([...(a.habits || []), ...(b.habits || [])])], mood: a.mood || b.mood,
+    tw: Object.assign({}, a.tw, b.tw), time, bonus, said: [...new Set([...(a.said || []), ...(b.said || [])])]};
+}
+// every iPad's days together, for the Piggy Bank record
+function allDaylog(){
+  const out = JSON.parse(JSON.stringify(store.get('daylog', {})));
+  Object.values(remotes()).forEach(r => Object.entries(r.daylog || {}).forEach(([k, e]) => { out[k] = mergeDay(out[k], e); }));
+  return out;
+}
+function allHistory(){
+  const h = store.get('bank.history', []).map(x => ({...x}));
+  Object.entries(remotes()).forEach(([id, r]) => (r.history || []).forEach(x => h.push({...x, dev: id})));
+  return h.sort((a, b) => a.t - b.t);
+}
+// `stars` is the total shown to him (this iPad + other iPads); only this iPad's part is saved locally
+let stars = store.get('stars', 0) + remoteStars();
+const saveStars = () => store.set('stars', stars - remoteStars());
 let lang  = store.get('lang', 'both'); // both | en | zh
 
 /* ---------- speech ---------- */
@@ -640,7 +675,7 @@ function taskBonus(task, fromEl){
   }, 2600);
 }
 function bumpStars(n = 1){
-  stars += n; store.set('stars', stars);
+  stars += n; saveStars();
   if (n > 0) logToday(e => { e.stars += n; });
   const s = document.getElementById('starCount');
   if (s){ s.textContent = stars; s.parentElement.classList.remove('bump'); void s.offsetWidth; s.parentElement.classList.add('bump'); }
@@ -934,7 +969,7 @@ const MOODS = [
 ];
 const todayLog = () => Object.assign({habits: [], mood: null}, store.get('daylog', {})[isoDay()]);
 function takeStar(){   // a parent un-ticks a habit: give that star back
-  stars = Math.max(0, stars - 1); store.set('stars', stars);
+  stars = Math.max(0, stars - 1); saveStars();
   logToday(e => { e.stars = Math.max(0, e.stars - 1); });
   const s = document.getElementById('starCount'); if (s) s.textContent = stars;
 }
@@ -1011,7 +1046,7 @@ function habits(){
 /* ---------- piggy bank: 50 stars = $1, cashed out by a parent ---------- */
 function bank(){
   navigate();
-  const history = store.get('bank.history', []);   // [{t: timestamp, d: dollars}]
+  const history = allHistory();   // [{t: timestamp, d: dollars, dev?: other iPad}]
   const dollars = Math.floor(stars / STAMPS_PER_DOLLAR);
   const left = stars % STAMPS_PER_DOLLAR;
   const paidTotal = history.reduce((a, h) => a + h.d, 0);
@@ -1030,15 +1065,18 @@ function bank(){
       <div class="bank-next">${STAMPS_PER_DOLLAR - left} more stars for the next dollar!<span class="zh">再得${STAMPS_PER_DOLLAR - left}颗星星，就多一块钱！</span></div>
       <button class="pill chunky parent-btn" id="cashBtn">👨‍👩‍👦 Parents: cash out<span class="zh">家长兑换</span></button>
       <div class="cash-day">${cashDayText()}</div>
+      <button class="pill chunky parent-btn" id="syncBtn">📲 Other iPad: send / receive<span class="zh">其他iPad：发送 / 接收</span></button>
+      ${Object.keys(remotes()).length ? `<div class="cash-day">📲 Includes stars from ${Object.keys(remotes()).length} other iPad${Object.keys(remotes()).length > 1 ? 's' : ''} 包含其他iPad的星星</div>` : ''}
       ${bankRecords(history, paidTotal)}
     </main>`;
   document.getElementById('homeBtn').onclick = () => { sfx.pop(); home(); };
   say(`You have ${stars} stars. That's ${dollars} dollar${dollars === 1 ? '' : 's'}!`, `你有${stars}颗星星，是${dollars}块钱！`);
   document.getElementById('cashBtn').onclick = () => { sfx.pop(); parentGate(parentPanel); };
+  document.getElementById('syncBtn').onclick = () => { sfx.pop(); parentGate(syncPanel); };
 }
 // parents' record: one row per day + every cash-out
 function bankRecords(history, paidTotal){
-  const log = store.get('daylog', {});
+  const log = allDaylog();
   const days = Object.keys(log).sort().reverse().slice(0, 60);
   const dayName = k => new Date(k + 'T00:00').toLocaleDateString(undefined, {weekday: 'short', month: 'numeric', day: 'numeric'});
   const yes = (v, txt) => v ? `<span class="ok">✅ ${txt}</span>` : '<span class="no">—</span>';
@@ -1075,7 +1113,7 @@ function bankRecords(history, paidTotal){
     </table></div>` : '<p class="no">No days recorded yet. 还没有记录。</p>'}
     <h3>💵 Cash-outs <span class="zh">兑换记录</span></h3>
     ${history.length ? `<ul class="cash-list">${history.slice().reverse().map(h =>
-      `<li><span>${new Date(h.t).toLocaleString(undefined, {weekday: 'short', month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit'})}</span><b>$${h.d}</b><span class="no">${h.s || h.d * STAMPS_PER_DOLLAR} ⭐</span></li>`).join('')}</ul>`
+      `<li><span>${new Date(h.t).toLocaleString(undefined, {weekday: 'short', month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit'})}</span><b>$${h.d}</b><span class="no">${h.s || h.d * STAMPS_PER_DOLLAR} ⭐${h.dev ? ` · 📲 ${h.dev}` : ''}</span></li>`).join('')}</ul>`
       : '<p class="no">No cash-outs yet. 还没有兑换。</p>'}
   </section>`;
 }
@@ -1087,7 +1125,7 @@ const SCHEDULES = {
 };
 const cashSched = () => SCHEDULES[store.get('bank.sched', 'week')] ? store.get('bank.sched', 'week') : 'week';
 function nextCashDate(){
-  const h = store.get('bank.history', []);
+  const h = allHistory();
   let start = store.get('bank.start', null);
   if (!start){ start = Date.now(); store.set('bank.start', start); }
   const base = new Date(h.length ? h[h.length - 1].t : start);
@@ -1127,6 +1165,95 @@ function parentPanel(){
   };
   draw(); document.body.appendChild(ov);
 }
+/* ---------- move stars between iPads: send a file (AirDrop), receive it on the other iPad ---------- */
+function exportData(){
+  const devices = JSON.parse(JSON.stringify(remotes()));
+  devices[deviceId] = {at: Date.now(), stars: store.get('stars', 0), daylog: store.get('daylog', {}), history: store.get('bank.history', [])};
+  return {app: 'academy', v: 1, from: deviceId, name: (me() || {}).name || '', profile: me(), exportedAt: Date.now(), devices};
+}
+function importData(d){
+  const rs = remotes();
+  Object.entries(d.devices || {}).forEach(([id, snap]) => {
+    if (id === deviceId) return;                                   // this iPad's own data is already here
+    if (!rs[id] || (snap.at || 0) >= (rs[id].at || 0)) rs[id] = snap; // newer snapshot replaces older one
+  });
+  store.set('remotes', rs);
+  if (!me() && d.profile) store.set('profile', d.profile);
+  stars = store.get('stars', 0) + remoteStars();
+}
+// total after a file is added, without changing anything yet
+function previewImport(d){
+  const rs = JSON.parse(JSON.stringify(remotes()));
+  Object.entries(d.devices || {}).forEach(([id, snap]) => { if (id !== deviceId && (!rs[id] || (snap.at || 0) >= (rs[id].at || 0))) rs[id] = snap; });
+  return store.get('stars', 0) + Object.values(rs).reduce((a, r) => a + (r.stars || 0), 0);
+}
+function syncPanel(){
+  const ov = document.createElement('div'); ov.className = 'overlay';
+  const name = (me() || {}).name || '';
+  const fmtD = t => new Date(t).toLocaleDateString(undefined, {month: 'numeric', day: 'numeric'});
+  const draw = (msg = '') => {
+    const rs = remotes();
+    ov.innerHTML = `<div class="card gate sync">
+      <p class="gate-q">📲 Other iPad<br><small>在iPad之间转移星星</small></p>
+      <div class="sync-list">
+        <div><b>This iPad 本机</b> · ${deviceId} · ⭐ ${store.get('stars', 0)}</div>
+        ${Object.entries(rs).map(([id, r]) => `<div>📲 iPad ${id} · ⭐ ${r.stars || 0} · <span class="no">updated ${fmtD(r.at)}</span></div>`).join('')}
+        <div class="sync-total">Total for ${name} 合计: ⭐ ${stars}</div>
+      </div>
+      <div class="gate-opts">
+        <button class="pill chunky gate-ok" data-send>📤 Send 发送</button>
+        <button class="pill chunky" data-recv>📥 Receive 接收</button>
+      </div>
+      <input type="file" id="syncFile" accept=".json,application/json" hidden>
+      ${msg ? `<p class="sync-msg">${msg}</p>` : ''}
+      <ol class="sync-help">
+        <li><b>Send</b> on this iPad → choose <b>AirDrop</b> → pick the other iPad. 本机点“发送”，选“隔空投送”。</li>
+        <li>On the other iPad: A's Academy → Piggy Bank → 📲 Other iPad → <b>Receive</b> → pick the file (Files → Downloads). 另一台iPad点“接收”，在“文件→下载”里选这个文件。</li>
+        <li>Do it again any time — it updates, it never counts twice. 可以随时再做一次，不会重复计算。</li>
+      </ol>
+      <div class="gate-opts"><button class="pill chunky" data-x>Close</button></div></div>`;
+    ov.querySelector('#syncFile').onchange = e => { const f = e.target.files[0]; if (f) receive(f); };
+  };
+  async function send(){
+    const fname = `Academy-${name.replace(/[^A-Za-z0-9]/g, '') || 'kid'}-${isoDay()}.json`;
+    const blob = new Blob([JSON.stringify(exportData())], {type: 'application/json'});
+    const file = new File([blob], fname, {type: 'application/json'});
+    if (navigator.canShare && navigator.canShare({files: [file]})){
+      try { await navigator.share({files: [file], title: `A's Academy – ${name}`}); return draw('✅ Sent! Now tap Receive on the other iPad. 已发送！'); }
+      catch (e){ if (e.name === 'AbortError') return; }
+    }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname;
+    document.body.appendChild(a); a.click(); a.remove();
+    draw(`✅ Saved “${fname}”. Send it to the other iPad (AirDrop), then tap Receive there. 已保存文件。`);
+  }
+  async function receive(f){
+    let d;
+    try { d = JSON.parse(await f.text()); } catch (_) { d = null; }
+    if (!d || d.app !== 'academy' || !d.devices) return draw("⚠️ That isn't an A's Academy file. 这不是A's Academy的文件。");
+    const others = Object.keys(d.devices).filter(id => id !== deviceId);
+    if (!others.length) return draw('ℹ️ That file came from this iPad. 这个文件来自本机。');
+    const after = previewImport(d);
+    const sameKid = !d.name || !name || d.name.toLowerCase() === name.toLowerCase();
+    ov.innerHTML = `<div class="card gate sync">
+      <p class="gate-q">📥 Add stars?<br><small>加入星星？</small></p>
+      <p class="gate-sub">From ${d.name || 'a kid'}'s other iPad (${others.join(', ')})<br>
+        <b>${name}: ⭐ ${stars} → ⭐ ${after}</b></p>
+      ${sameKid ? '' : `<p class="sync-msg">⚠️ This file is for <b>${d.name}</b>, but this iPad is showing <b>${name}</b>. If that's wrong, cancel and tap the avatar on the home screen to switch kids first.</p>`}
+      <div class="gate-opts"><button class="pill chunky" data-cancel>Cancel</button><button class="pill chunky gate-ok" data-add>Add 加入</button></div></div>`;
+    ov.querySelector('[data-add]').onclick = () => {
+      importData(d); sfx.yay(); ov.remove(); bank();
+      cheer(`📲 ⭐ ${stars}`, `Stars from your other iPad are here! You have ${stars} stars.`, `另一台iPad的星星到了！你一共有${stars}颗星星。`);
+    };
+    ov.querySelector('[data-cancel]').onclick = () => draw();
+  }
+  ov.onclick = e => {
+    if (e.target.closest('[data-send]')){ sfx.pop(); send(); return; }
+    if (e.target.closest('[data-recv]')){ sfx.pop(); ov.querySelector('#syncFile').click(); return; }
+    if (e.target === ov || e.target.closest('[data-x]')){ ov.remove(); bank(); }
+  };
+  draw(); document.body.appendChild(ov);
+}
+
 // simple grown-up check so he can't cash out by himself
 function parentGate(onPass){
   const a = 6 + rand(4), b = 6 + rand(4), ans = a * b;
@@ -1161,7 +1288,7 @@ function cashOut(max){
     const d = e.target.closest('[data-d]');
     if (d){ n = Math.min(max, Math.max(1, n + +d.dataset.d)); sfx.pop(); draw(); return; }
     if (e.target.closest('[data-ok]')){
-      stars -= n * STAMPS_PER_DOLLAR; store.set('stars', stars);
+      stars -= n * STAMPS_PER_DOLLAR; saveStars();
       const h = store.get('bank.history', []); h.push({t: Date.now(), d: n, s: n * STAMPS_PER_DOLLAR}); store.set('bank.history', h);
       logToday(e => { e.paid += n; });
       ov.remove(); bank();
