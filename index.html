@@ -353,6 +353,11 @@ input{-webkit-user-select:text;user-select:text}
 .bday-pick{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:8px 0}
 .bday-pick label{display:flex;flex-direction:column;gap:4px;font-weight:900;font-size:16px;color:var(--muted)}
 .bday-pick select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);padding:10px 12px;border-radius:16px;border:3px solid var(--edge);background:#fff;min-width:96px}
+img.e3d{width:1.12em;height:1.12em;vertical-align:-.2em;display:inline-block;object-fit:contain;pointer-events:none;-webkit-user-drag:none;user-select:none}
+.ic-e{font-size:30px;line-height:1;display:grid;place-items:center}
+.round .ic-e img.e3d{width:34px;height:34px;vertical-align:0}
+.tile-icon img.e3d{width:1.25em;height:1.25em;filter:drop-shadow(0 6px 6px rgba(0,0,0,.18))}
+.tile.wide .tile-icon{font-size:clamp(52px,7vw,80px)}
 .records{width:min(860px,100%);margin-top:14px;text-align:left}
 .records h3{font-size:clamp(20px,2.8vw,26px);margin:18px 0 8px}
 .rec-wrap{overflow-x:auto;border-radius:20px;box-shadow:0 5px 0 var(--edge)}
@@ -613,46 +618,63 @@ const sfx = {
   oops: () => tone([320, 250], 0.12, 'sine', 0.08),
 };
 
-/* ---------- icons ---------- */
-const svgI = d => `<svg viewBox="0 0 24 24" class="ic" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+/* ---------- icons: emoji, shown as Fluent 3D pictures by the swapper below ---------- */
+const icE = e => `<span class="ic-e" aria-hidden="true">${e}</span>`;
 const IC = {
-  home:  svgI('<path d="M3 11 12 3.5 21 11"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/>'),
-  speak: svgI('<path d="M11 5 6.5 9H3v6h3.5L11 19z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>'),
-  prev:  svgI('<path d="m14.5 5-7 7 7 7"/>'),
-  next:  svgI('<path d="m9.5 5 7 7-7 7"/>'),
-  erase: svgI('<path d="m7.5 20-4-4a1.4 1.4 0 0 1 0-2l9.6-9.6a1.4 1.4 0 0 1 2 0l5 5a1.4 1.4 0 0 1 0 2L12 20"/><path d="M21 20H7.5"/><path d="m6 11.5 7 7"/>'),
-  grid:  svgI('<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/>'),
-  close: svgI('<path d="M18 6 6 18M6 6l12 12"/>'),
-  mic:   svgI('<rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21.5M8.5 21.5h7"/>'),
+  home: icE('🏠'), speak: icE('🔊'), prev: icE('◀️'), next: icE('▶️'), erase: icE('🧽'),
+  grid: icE('🔤'), close: icE('✖️'), mic: icE('🎤'), bulb: icE('💡'),
   spell: '<span class="ic-txt">a·b·c</span>',
-  bulb:  svgI('<path d="M9 18h6M10 21.5h4"/><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.5.4.8 1 .8 1.6V16h6v-.1c0-.6.3-1.2.8-1.6A6.5 6.5 0 0 0 12 2.5z"/>'),
 };
-// colourful pictures for the home tiles
-const TILE_ART = {
-  trace: `<svg viewBox="0 0 112 100" aria-hidden="true"><rect x="8" y="12" width="66" height="76" rx="12" fill="#fff"/>
-    <path d="M18 36h46M18 54h46M18 72h46" stroke="#d0bfff" stroke-width="3" stroke-dasharray="3 5" stroke-linecap="round"/>
-    <path d="M22 72 33 36l11 36M26 60h14" stroke="#7048e8" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="57" cy="64" r="8" stroke="#7048e8" stroke-width="6" fill="none"/><path d="M65 56v16" stroke="#7048e8" stroke-width="6" stroke-linecap="round"/>
-    <g transform="translate(18 2) rotate(35 74 58)"><rect x="66" y="14" width="17" height="58" rx="4" fill="#ffd43b"/><rect x="66" y="14" width="17" height="11" rx="4" fill="#ff8787"/>
-    <rect x="66" y="24" width="17" height="5" fill="#ced4da"/><path d="M66 72l8.5 17L83 72z" fill="#ffe8cc"/><path d="M71.6 83.5l2.9 5.5 2.9-5.5z" fill="#343a40"/></g></svg>`,
-  words: `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 28C40 20 24 18 8 20v58c16-2 32 0 42 8 10-8 26-10 42-8V20c-16-2-32 0-42 8z" fill="#fff"/>
-    <path d="M50 28v58" stroke="#ffc9c9" stroke-width="3"/><path d="M17 38h23M17 49h23M17 60h17" stroke="#ffc9c9" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="71" cy="57" r="16" fill="#fa5252"/><ellipse cx="65" cy="51" rx="4" ry="5" fill="#ff8787"/>
-    <path d="M71 41c0-6 3-10 7-11" stroke="#7c4a2d" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M73 39c6-7 13-5 15-3-6 6-12 6-15 3z" fill="#51cf66"/></svg>`,
-  math: `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="35" y="10" width="30" height="30" rx="7" fill="#ff8787"/><rect x="6" y="52" width="32" height="32" rx="7" fill="#4dabf7"/><rect x="62" y="52" width="32" height="32" rx="7" fill="#ffd43b"/>
-    <g fill="#fff" font-family="ui-rounded,Arial Rounded MT Bold,system-ui" font-weight="900" font-size="24" text-anchor="middle"><text x="50" y="34">3</text><text x="22" y="77">1</text><text x="78" y="77" fill="#7a5a00">2</text></g>
-    <path d="M44 68h12M50 62v12" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M41 46 34 50M59 46l7 4" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".8"/></svg>`,
-  habits: `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 90C21 69 7 53 7 34 7 19 18 9 32 9c8 0 14 4 18 10 4-6 10-10 18-10 14 0 25 10 25 25 0 19-14 35-43 56z" fill="#fff"/>
-    <circle cx="36" cy="40" r="5" fill="#343a40"/><circle cx="64" cy="40" r="5" fill="#343a40"/><path d="M35 54c8 9 22 9 30 0" stroke="#343a40" stroke-width="5" fill="none" stroke-linecap="round"/>
-    <circle cx="26" cy="52" r="5.5" fill="#ffa8a8"/><circle cx="74" cy="52" r="5.5" fill="#ffa8a8"/>
-    <path d="M86 6l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#ffe066"/><path d="M12 70l2 4.5 4.5 2-4.5 2-2 4.5-2-4.5-4.5-2 4.5-2z" fill="#ffe066"/></svg>`,
-  bank: `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="55" cy="15" r="10" fill="#ffd43b" stroke="#f59f00" stroke-width="3"/><path d="M55 10v10" stroke="#f59f00" stroke-width="3" stroke-linecap="round"/>
-    <path d="M15 56c-7 1-10-6-5-9" stroke="#f783ac" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <rect x="30" y="74" width="11" height="15" rx="4" fill="#f06595"/><rect x="58" y="74" width="11" height="15" rx="4" fill="#f06595"/>
-    <ellipse cx="50" cy="58" rx="36" ry="27" fill="#ffc9de"/><path d="M27 37l2-15 13 9z" fill="#f783ac"/>
-    <ellipse cx="85" cy="58" rx="9" ry="11" fill="#f783ac"/><circle cx="83" cy="54" r="2.2" fill="#a61e4d"/><circle cx="83" cy="62" r="2.2" fill="#a61e4d"/>
-    <circle cx="68" cy="47" r="4" fill="#343a40"/><rect x="43" y="33" width="20" height="5" rx="2.5" fill="#a61e4d"/></svg>`,
-};
+/* ---------- 3D pictures ----------
+   Emoji are shown as Microsoft Fluent Emoji 3D pictures (MIT licence, see emoji/LICENSE).
+   EMOJI_3D maps an emoji (without U+FE0F) to its file in emoji/; anything not listed stays a normal emoji. */
+const EMOJI_3D = {"🏠":"house","🔊":"speaker_high_volume","◀":"reverse_button","▶":"play_button","🧽":"sponge","🔤":"input_latin_letters","✖":"multiply","🎤":"microphone","💡":"light_bulb","🍎":"red_apple","⚽":"soccer_ball","🐱":"cat_face","🐶":"dog_face","🐘":"elephant","🐟":"fish","🍇":"grapes","🍦":"soft_ice_cream","🧃":"beverage_box","🪁":"kite","🦁":"lion","🌙":"crescent_moon","🪺":"nest_with_eggs","🍊":"tangerine","🐷":"pig_face","👸":"princess","🐰":"rabbit_face","☀":"sun","🐯":"tiger_face","☂":"umbrella","🎻":"violin","🍉":"watermelon","🦊":"fox","🪀":"yo-yo","🦓":"zebra","⭐":"star","🚗":"automobile","🐤":"baby_chick","🍓":"strawberry","🎈":"balloon","🐞":"lady_beetle","🍪":"cookie","🦕":"sauropod","🌸":"cherry_blossom","🚀":"rocket","🧸":"teddy_bear","✏":"pencil","🔢":"input_numbers","📝":"memo","📚":"books","🧮":"abacus","😊":"smiling_face_with_smiling_eyes","✅":"check_mark_button","⬜":"white_large_square","🎁":"wrapped_gift","💵":"dollar_banknote","✨":"sparkles","🎉":"party_popper","💛":"yellow_heart","🌟":"glowing_star","🐼":"panda","🐨":"koala","🐸":"frog","🐵":"monkey_face","🦄":"unicorn","🐲":"dragon_face","🙂":"slightly_smiling_face","🎂":"birthday_cake","👋":"waving_hand","🎨":"artist_palette","↩":"right_arrow_curving_left","🔁":"repeat_button","➕":"plus","🗑":"wastebasket","❓":"red_question_mark","🎮":"video_game","🥣":"bowl_with_spoon","👕":"t-shirt","🏫":"school","🍽":"fork_and_knife_with_plate","👂":"ear","🪥":"toothbrush","💬":"speech_balloon","🛌":"person_in_bed","😄":"grinning_face_with_smiling_eyes","😌":"relieved_face","😢":"crying_face","😠":"angry_face","😨":"fearful_face","😴":"sleeping_face","🔓":"unlocked","🌱":"seedling","📲":"mobile_phone_with_arrow","👛":"purse","📒":"ledger","⏱":"stopwatch","🛍":"shopping_bags","🎯":"bullseye","📅":"calendar","🏆":"trophy","📤":"outbox_tray","📥":"inbox_tray","⚠":"warning","ℹ":"information","🔒":"locked","🦖":"t-rex","🚂":"locomotive","🚲":"bicycle","🏖":"beach_with_umbrella","🧱":"brick","🛝":"playground_slide","🐜":"ant","💪":"flexed_biceps","🪓":"axe","✈":"airplane","🐊":"crocodile","🧑‍🚀":"astronaut","🥑":"avocado","👼":"baby_angel","⚓":"anchor","🚑":"ambulance","👽":"alien","🌰":"chestnut","🦇":"bat","🛏":"bed","🐝":"honeybee","🐦":"bird","⛵":"sailboat","📖":"open_book","📦":"package","👦":"boy","🚌":"bus","🐻":"bear","🍌":"banana","🍞":"bread","🔔":"bell","🥤":"cup_with_straw","🐮":"cow_face","🧢":"billed_cap","🥕":"carrot","🌽":"ear_of_corn","🦀":"crab","👑":"crown","🍬":"candy","🐫":"two-hump_camel","🕐":"one_oclock","☁":"cloud","🦆":"duck","🪆":"nesting_dolls","🚪":"door","🥁":"drum","👨":"man","🦌":"deer","🎲":"game_die","🐬":"dolphin","🍩":"doughnut","🐉":"dragon","👗":"dress","💎":"gem_stone","🧑‍⚕":"health_worker","🥚":"egg","👁":"eye","🦅":"eagle","🌍":"globe_showing_europe-africa","8⃣":"keycap_8","✉":"envelope","🧝":"person_elf","🍆":"eggplant","🛗":"elevator","📧":"e-mail","🐑":"ewe","🕚":"eleven_oclock","🪭":"folding_hand_fan","🦶":"foot","🔥":"fire","🚩":"triangular_flag","🍴":"fork_and_knife","5⃣":"keycap_5","🪶":"feather","🍟":"french_fries","🪰":"fly","😀":"grinning_face","4⃣":"keycap_4","🐐":"goat","👧":"girl","🦍":"gorilla","👻":"ghost","🦒":"giraffe","👓":"glasses","🌏":"globe_showing_asia-australia","🎸":"guitar","🪿":"goose","🟢":"green_circle","🧤":"gloves","🎩":"top_hat","🐔":"chicken","🐴":"horse_face","✋":"raised_hand","❤":"red_heart","🦛":"hippopotamus","🍯":"honey_pot","🔨":"hammer","🚁":"helicopter","🍔":"hamburger","🦔":"hedgehog","🪝":"hook","🤗":"hugging_face","🥵":"hot_face","🧊":"ice","🖋":"fountain_pen","🤒":"face_with_thermometer","🌿":"herb","😈":"smiling_face_with_horns","📏":"straight_ruler","🪻":"hyacinth","🏝":"desert_island","🐛":"bug","👶":"baby","💌":"love_letter","🦎":"lizard","🏔":"snow-capped_mountain","🫙":"jar","🛩":"small_airplane","👖":"jeans","🪼":"jellyfish","🤸":"person_cartwheeling","🧑‍⚖":"judge","🃏":"joker","😂":"face_with_tears_of_joy","🤹":"person_juggling","🧥":"coat","🐆":"leopard","🚙":"sport_utility_vehicle","🧩":"puzzle_piece","🔑":"key","🤴":"prince","💋":"kiss_mark","🧒":"child","🦘":"kangaroo","🐈":"cat","🔪":"kitchen_knife","🪢":"knot","🥝":"kiwi_fruit","⌨":"keyboard","🦵":"leg","🛶":"canoe","👘":"kimono","🍃":"leaf_fluttering_in_wind","🍋":"lemon","👄":"mouth","🪵":"wood","🪜":"ladder","🦙":"llama","🦞":"lobster","🍭":"lollipop","💻":"laptop","👩":"woman","🐭":"mouse_face","🥛":"glass_of_milk","🗺":"world_map","🥭":"mango","🎭":"performing_arts","🍈":"melon","🧲":"magnet","🍄":"mushroom","💰":"money_bag","📬":"open_mailbox_with_raised_flag","⛰":"mountain","🧁":"cupcake","👃":"nose","🥅":"goal_net","🥜":"peanuts","9⃣":"keycap_9","🌃":"night_with_stars","🥷":"ninja","📿":"prayer_beads","🪡":"sewing_needle","📰":"newspaper","📓":"notebook","🍜":"steaming_bowl","💅":"nail_polish","🦉":"owl","🐂":"ox","🐙":"octopus","🦦":"otter","🫒":"olive","🧅":"onion","1⃣":"keycap_1","🌊":"water_wave","👹":"ogre","🦪":"oyster","👌":"ok_hand","📂":"open_file_folder","📴":"mobile_phone_off","🚣":"person_rowing_boat","🖊":"pen","🍳":"cooking","🥧":"pie","🍐":"pear","🍕":"pizza","🐧":"penguin","🦜":"parrot","🍑":"peach","🎃":"jack-o-lantern","🍿":"popcorn","👮":"police_officer","🤫":"shushing_face","⚡":"high_voltage","🪙":"coin","🛑":"stop_sign","🌋":"volcano","🤢":"nauseated_face","🐀":"rat","🔴":"red_circle","🌧":"cloud_with_rain","💍":"ring","🪨":"rock","🌹":"rose","🤖":"robot","🌈":"rainbow","📻":"radio","🏃":"person_running","🍚":"cooked_rice","🐓":"rooster","🧦":"socks","🐍":"snake","🚢":"ship","👟":"running_shoe","🦭":"seal","🐌":"snail","🕷":"spider","🧂":"salt","6⃣":"keycap_6","🥪":"sandwich","🌳":"deciduous_tree","🚚":"delivery_truck","🐢":"turtle","🦷":"tooth","⛺":"tent","2⃣":"keycap_2","🔟":"keycap_10","🚕":"taxi","🍅":"tomato","🍵":"teacup_without_handle","👅":"tongue","⬆":"up_arrow","⬇":"down_arrow","🛸":"flying_saucer","😞":"disappointed_face","🥋":"martial_arts_uniform","🪕":"banjo","⚱":"funeral_urn","😟":"worried_face","🧔":"person_beard","🙃":"upside-down_face","🚐":"minibus","🏺":"amphora","🦺":"safety_vest","🐕":"dog","🧛":"person_vampire","📹":"video_camera","🏘":"houses","🗳":"ballot_box_with_ballot","🥦":"broccoli","🟣":"purple_circle","💝":"heart_with_ribbon","🗣":"speaking_head","✌":"victory_hand","🕸":"spider_web","💦":"sweat_droplets","🪱":"worm","🐺":"wolf","🐳":"spouting_whale","⌚":"watch","💧":"droplet","🪟":"window","🛞":"wheel","🧙":"person_mage","🌬":"wind_face","🪽":"wing","🚶":"person_walking","🔧":"wrench","🕯":"candle","⏭":"next_track_button","🎷":"saxophone","🧰":"toolbox","🎶":"musical_notes","🐃":"water_buffalo","🧶":"yarn","🥱":"yawning_face","🟡":"yellow_circle","🍠":"roasted_sweet_potato","🛥":"motor_boat","👉":"backhand_index_pointing_right","😋":"face_savoring_food","🧘":"person_in_lotus_position","0⃣":"keycap_0","🤐":"zipper-mouth_face","🧟":"person_zombie","〰":"wavy_dash","🚧":"construction","🥒":"cucumber","🤪":"zany_face","🔍":"magnifying_glass_tilted_left","♈":"aries","🥈":"2nd_place_medal","🏅":"sports_medal","👨‍👩‍👦":"people_hugging","👫":"people_hugging"};
+const EMO_RE = /[0-9#*]️?⃣|\p{Extended_Pictographic}️?(?:‍\p{Extended_Pictographic}️?)*/gu;
+const EMO_TEST = new RegExp(EMO_RE.source, 'u');
+const EMO_SKIP = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT', 'OPTION', 'SELECT', 'TITLE']);
+const EMO_FAILED = new Set();
+function emojify(root){
+  if (!root || (root.nodeType !== 1 && root.nodeType !== 11)) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode: n => {
+    const el = n.parentElement;
+    if (!el || EMO_SKIP.has(el.nodeName) || el.closest('svg,.no3d')) return NodeFilter.FILTER_REJECT;
+    return EMO_TEST.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+  }});
+  const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(n => {
+    const txt = n.nodeValue; let last = 0, frag = null;
+    txt.replace(EMO_RE, (m, off) => {
+      const f = EMOJI_3D[m.replace(/️/g, '')]; if (!f || EMO_FAILED.has(f)) return m;
+      frag = frag || document.createDocumentFragment();
+      if (off > last) frag.appendChild(document.createTextNode(txt.slice(last, off)));
+      const img = document.createElement('img');
+      img.className = 'e3d'; img.src = 'emoji/' + f + '.png'; img.alt = m; img.draggable = false;
+      // offline + not saved yet: show the plain emoji, and don't try that picture again this session
+      img.onerror = () => { EMO_FAILED.add(f); const t = document.createElement('span'); t.className = 'no3d'; t.textContent = m; img.replaceWith(t); };
+      frag.appendChild(img); last = off + m.length; return m;
+    });
+    if (frag){ if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last))); n.replaceWith(frag); }
+  });
+}
+new MutationObserver(muts => {
+  for (const m of muts) for (const n of m.addedNodes){
+    if (n.nodeType === 1) emojify(n);
+    else if (n.nodeType === 3 && n.parentElement) emojify(n.parentElement);
+  }
+}).observe(document.documentElement, {childList: true, subtree: true});
+// once, when online: quietly save every picture so the whole app works offline
+function warmPictures(){
+  try { if (localStorage.getItem('academy.pics') === '1') return; } catch(e){ return; }
+  if (!navigator.onLine || !('serviceWorker' in navigator)) return;
+  const files = [...new Set(Object.values(EMOJI_3D))]; let i = 0;
+  const next = () => {
+    if (i >= files.length){ try { localStorage.setItem('academy.pics', '1'); } catch(e){} return; }
+    fetch('emoji/' + files[i++] + '.png').catch(() => {}).finally(() => setTimeout(next, 120));
+  };
+  setTimeout(next, 4000);
+}
+window.addEventListener('load', warmPictures);
+
 /* ---------- data ---------- */
 const LETTERS = [
   ['A','Apple','苹果','🍎'],['B','Ball','球','⚽'],['C','Cat','猫','🐱'],['D','Dog','狗','🐶'],
@@ -670,12 +692,12 @@ const TILE_COLORS = ['#ff6b6b','#3b9cf0','#f59f00','#37b24d','#9775fa','#f06595'
 const PRAISE = [['Great job!','真棒！'],['Yes! You got it!','对了！'],['Super!','太厉害了！'],['Well done!','做得好！'],['Awesome!','好极了！']];
 
 const MODULES = [
-  {id:'trace', en:'Trace & Write', zh:'描红写字', icon:TILE_ART.trace, c:'#9775fa', d:'#6f4bd8',
+  {id:'trace', en:'Trace & Write', zh:'描红写字', icon:'✏️', c:'#9775fa', d:'#6f4bd8',
    modes:[['letters','🔤 Letters','字母'],['numbers','🔢 Numbers','数字'],['words','📝 Words','单词']]},
-  {id:'words',   en:'Words', zh:'单词', icon:TILE_ART.words, c:'#ff6b6b', d:'#d94848'},
-  {id:'math',    en:'Math', zh:'数学', icon:TILE_ART.math, c:'#40c057', d:'#2b8a3e', learn:false},
-  {id:'habits',  en:'Habits & Feelings', zh:'好习惯和心情', icon:TILE_ART.habits, c:'#20c997', d:'#0ca678'},
-  {id:'bank',    en:'Piggy Bank', zh:'存钱罐', icon:TILE_ART.bank, c:'#f783ac', d:'#d6336c', wide:true},
+  {id:'words',   en:'Words', zh:'单词', icon:'📚', c:'#ff6b6b', d:'#d94848'},
+  {id:'math',    en:'Math', zh:'数学', icon:'🧮', c:'#40c057', d:'#2b8a3e', learn:false},
+  {id:'habits',  en:'Habits & Feelings', zh:'好习惯和心情', icon:'😊', c:'#20c997', d:'#0ca678'},
+  {id:'bank',    en:'Piggy Bank', zh:'存钱罐', icon:'🐷', c:'#f783ac', d:'#d6336c', wide:true},
 ];
 const STAMPS_PER_DOLLAR = 50;
 
