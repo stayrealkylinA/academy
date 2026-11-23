@@ -371,6 +371,15 @@ body.lang-zh .tile-zh{font-size:clamp(22px,2.8vw,32px);opacity:1}
 #homeBtn{background:none;box-shadow:none;width:64px;height:64px}
 #homeBtn .home-logo{width:60px;height:60px;border-radius:16px;display:block;box-shadow:0 5px 0 rgba(214,51,108,.3)}
 #homeBtn:active .home-logo{box-shadow:0 1px 0 rgba(214,51,108,.3)}
+.bad-head{margin-top:10px}
+.bad-head h3 b{color:#e03131}
+.bad-note{font-weight:800;color:#e03131;font-size:clamp(14px,1.9vw,17px)}
+.habit.bad .h-c{font-size:20px;font-weight:900;color:#e03131;min-width:44px}
+.habit.bad.on{background:#fff5f5;--sh:#ffc9c9}
+.habit.shake{animation:shake .4s}
+.minus-float{position:fixed;z-index:40;transform:translate(-50%,-50%);font-size:34px;font-weight:900;color:#e03131;pointer-events:none;animation:minusUp 1.3s ease-out forwards}
+@keyframes minusUp{to{transform:translate(-50%,-150%);opacity:0}}
+.bad-cell{color:#e03131;font-weight:800}
 .records{width:min(860px,100%);margin-top:14px;text-align:left}
 .records h3{font-size:clamp(20px,2.8vw,26px);margin:18px 0 8px}
 .rec-wrap{overflow-x:auto;border-radius:20px;box-shadow:0 5px 0 var(--edge)}
@@ -642,7 +651,7 @@ const IC = {
 /* ---------- 3D pictures ----------
    Emoji are shown as Microsoft Fluent Emoji 3D pictures (MIT licence, see emoji/LICENSE).
    EMOJI_3D maps an emoji (without U+FE0F) to its file in emoji/; anything not listed stays a normal emoji. */
-const EMOJI_3D = {"🏠":"house","🔊":"speaker_high_volume","◀":"reverse_button","▶":"play_button","🧽":"sponge","🔤":"input_latin_letters","✖":"multiply","🎤":"microphone","💡":"light_bulb","🍎":"red_apple","⚽":"soccer_ball","🐱":"cat_face","🐶":"dog_face","🐘":"elephant","🐟":"fish","🍇":"grapes","🍦":"soft_ice_cream","🧃":"beverage_box","🪁":"kite","🦁":"lion","🌙":"crescent_moon","🪺":"nest_with_eggs","🍊":"tangerine","🐷":"pig_face","👸":"princess","🐰":"rabbit_face","☀":"sun","🐯":"tiger_face","☂":"umbrella","🎻":"violin","🍉":"watermelon","🦊":"fox","🪀":"yo-yo","🦓":"zebra","⭐":"star","🚗":"automobile","🐤":"baby_chick","🍓":"strawberry","🎈":"balloon","🐞":"lady_beetle","🍪":"cookie","🦕":"sauropod","🌸":"cherry_blossom","🚀":"rocket","🧸":"teddy_bear","✏":"pencil","🔢":"input_numbers","📝":"memo","📚":"books","🧮":"abacus","😊":"smiling_face_with_smiling_eyes","✅":"check_mark_button","⬜":"white_large_square","🎁":"wrapped_gift","💵":"dollar_banknote","✨":"sparkles","🎉":"party_popper","💛":"yellow_heart","🌟":"glowing_star","🐼":"panda","🐨":"koala","🐸":"frog","🐵":"monkey_face","🦄":"unicorn","🐲":"dragon_face","🙂":"slightly_smiling_face","🎂":"birthday_cake","👋":"waving_hand","🎨":"artist_palette","↩":"right_arrow_curving_left","🔁":"repeat_button","➕":"plus","🗑":"wastebasket","❓":"red_question_mark","🎮":"video_game","🥣":"bowl_with_spoon","👕":"t-shirt","🏫":"school","🍽":"fork_and_knife_with_plate","👂":"ear","🪥":"toothbrush","💬":"speech_balloon","🛌":"person_in_bed","😄":"grinning_face_with_smiling_eyes","😌":"relieved_face","😢":"crying_face","😠":"angry_face","😨":"fearful_face","😴":"sleeping_face","🔓":"unlocked","🌱":"seedling","📲":"mobile_phone_with_arrow","👛":"purse","📒":"ledger","⏱":"stopwatch","🛍":"shopping_bags","🎯":"bullseye","📅":"calendar","🏆":"trophy","📤":"outbox_tray","📥":"inbox_tray","⚠":"warning","ℹ":"information","🔒":"locked","🦖":"t-rex","🚂":"locomotive","🚲":"bicycle","🏖":"beach_with_umbrella","🧱":"brick","🛝":"playground_slide","🐜":"ant","💪":"flexed_biceps","🪓":"axe","✈":"airplane","🐊":"crocodile","🧑‍🚀":"astronaut","🥑":"avocado","👼":"baby_angel","⚓":"anchor","🚑":"ambulance","👽":"alien","🌰":"chestnut","🦇":"bat","🛏":"bed","🐝":"honeybee","🐦":"bird","⛵":"sailboat","📖":"open_book","📦":"package","👦":"boy","🚌":"bus","🐻":"bear","🍌":"banana","🍞":"bread","🔔":"bell","🥤":"cup_with_straw","🐮":"cow_face","🧢":"billed_cap","🥕":"carrot","🌽":"ear_of_corn","🦀":"crab","👑":"crown","🍬":"candy","🐫":"two-hump_camel","🕐":"one_oclock","☁":"cloud","🦆":"duck","🪆":"nesting_dolls","🚪":"door","🥁":"drum","👨":"man","🦌":"deer","🎲":"game_die","🐬":"dolphin","🍩":"doughnut","🐉":"dragon","👗":"dress","💎":"gem_stone","🧑‍⚕":"health_worker","🥚":"egg","👁":"eye","🦅":"eagle","🌍":"globe_showing_europe-africa","8⃣":"keycap_8","✉":"envelope","🧝":"person_elf","🍆":"eggplant","🛗":"elevator","📧":"e-mail","🐑":"ewe","🕚":"eleven_oclock","🪭":"folding_hand_fan","🦶":"foot","🔥":"fire","🚩":"triangular_flag","🍴":"fork_and_knife","5⃣":"keycap_5","🪶":"feather","🍟":"french_fries","🪰":"fly","😀":"grinning_face","4⃣":"keycap_4","🐐":"goat","👧":"girl","🦍":"gorilla","👻":"ghost","🦒":"giraffe","👓":"glasses","🌏":"globe_showing_asia-australia","🎸":"guitar","🪿":"goose","🟢":"green_circle","🧤":"gloves","🎩":"top_hat","🐔":"chicken","🐴":"horse_face","✋":"raised_hand","❤":"red_heart","🦛":"hippopotamus","🍯":"honey_pot","🔨":"hammer","🚁":"helicopter","🍔":"hamburger","🦔":"hedgehog","🪝":"hook","🤗":"hugging_face","🥵":"hot_face","🧊":"ice","🖋":"fountain_pen","🤒":"face_with_thermometer","🌿":"herb","😈":"smiling_face_with_horns","📏":"straight_ruler","🪻":"hyacinth","🏝":"desert_island","🐛":"bug","👶":"baby","💌":"love_letter","🦎":"lizard","🏔":"snow-capped_mountain","🫙":"jar","🛩":"small_airplane","👖":"jeans","🪼":"jellyfish","🤸":"person_cartwheeling","🧑‍⚖":"judge","🃏":"joker","😂":"face_with_tears_of_joy","🤹":"person_juggling","🧥":"coat","🐆":"leopard","🚙":"sport_utility_vehicle","🧩":"puzzle_piece","🔑":"key","🤴":"prince","💋":"kiss_mark","🧒":"child","🦘":"kangaroo","🐈":"cat","🔪":"kitchen_knife","🪢":"knot","🥝":"kiwi_fruit","⌨":"keyboard","🦵":"leg","🛶":"canoe","👘":"kimono","🍃":"leaf_fluttering_in_wind","🍋":"lemon","👄":"mouth","🪵":"wood","🪜":"ladder","🦙":"llama","🦞":"lobster","🍭":"lollipop","💻":"laptop","👩":"woman","🐭":"mouse_face","🥛":"glass_of_milk","🗺":"world_map","🥭":"mango","🎭":"performing_arts","🍈":"melon","🧲":"magnet","🍄":"mushroom","💰":"money_bag","📬":"open_mailbox_with_raised_flag","⛰":"mountain","🧁":"cupcake","👃":"nose","🥅":"goal_net","🥜":"peanuts","9⃣":"keycap_9","🌃":"night_with_stars","🥷":"ninja","📿":"prayer_beads","🪡":"sewing_needle","📰":"newspaper","📓":"notebook","🍜":"steaming_bowl","💅":"nail_polish","🦉":"owl","🐂":"ox","🐙":"octopus","🦦":"otter","🫒":"olive","🧅":"onion","1⃣":"keycap_1","🌊":"water_wave","👹":"ogre","🦪":"oyster","👌":"ok_hand","📂":"open_file_folder","📴":"mobile_phone_off","🚣":"person_rowing_boat","🖊":"pen","🍳":"cooking","🥧":"pie","🍐":"pear","🍕":"pizza","🐧":"penguin","🦜":"parrot","🍑":"peach","🎃":"jack-o-lantern","🍿":"popcorn","👮":"police_officer","🤫":"shushing_face","⚡":"high_voltage","🪙":"coin","🛑":"stop_sign","🌋":"volcano","🤢":"nauseated_face","🐀":"rat","🔴":"red_circle","🌧":"cloud_with_rain","💍":"ring","🪨":"rock","🌹":"rose","🤖":"robot","🌈":"rainbow","📻":"radio","🏃":"person_running","🍚":"cooked_rice","🐓":"rooster","🧦":"socks","🐍":"snake","🚢":"ship","👟":"running_shoe","🦭":"seal","🐌":"snail","🕷":"spider","🧂":"salt","6⃣":"keycap_6","🥪":"sandwich","🌳":"deciduous_tree","🚚":"delivery_truck","🐢":"turtle","🦷":"tooth","⛺":"tent","2⃣":"keycap_2","🔟":"keycap_10","🚕":"taxi","🍅":"tomato","🍵":"teacup_without_handle","👅":"tongue","⬆":"up_arrow","⬇":"down_arrow","🛸":"flying_saucer","😞":"disappointed_face","🥋":"martial_arts_uniform","🪕":"banjo","⚱":"funeral_urn","😟":"worried_face","🧔":"person_beard","🙃":"upside-down_face","🚐":"minibus","🏺":"amphora","🦺":"safety_vest","🐕":"dog","🧛":"person_vampire","📹":"video_camera","🏘":"houses","🗳":"ballot_box_with_ballot","🥦":"broccoli","🟣":"purple_circle","💝":"heart_with_ribbon","🗣":"speaking_head","✌":"victory_hand","🕸":"spider_web","💦":"sweat_droplets","🪱":"worm","🐺":"wolf","🐳":"spouting_whale","⌚":"watch","💧":"droplet","🪟":"window","🛞":"wheel","🧙":"person_mage","🌬":"wind_face","🪽":"wing","🚶":"person_walking","🔧":"wrench","🕯":"candle","⏭":"next_track_button","🎷":"saxophone","🧰":"toolbox","🎶":"musical_notes","🐃":"water_buffalo","🧶":"yarn","🥱":"yawning_face","🟡":"yellow_circle","🍠":"roasted_sweet_potato","🛥":"motor_boat","👉":"backhand_index_pointing_right","😋":"face_savoring_food","🧘":"person_in_lotus_position","0⃣":"keycap_0","🤐":"zipper-mouth_face","🧟":"person_zombie","〰":"wavy_dash","🚧":"construction","🥒":"cucumber","🤪":"zany_face","🔍":"magnifying_glass_tilted_left","♈":"aries","🥈":"2nd_place_medal","🏅":"sports_medal","👨‍👩‍👦":"people_hugging","👫":"people_hugging"};
+const EMOJI_3D = {"🏠":"house","🔊":"speaker_high_volume","◀":"reverse_button","▶":"play_button","🧽":"sponge","🔤":"input_latin_letters","✖":"multiply","🎤":"microphone","💡":"light_bulb","🍎":"red_apple","⚽":"soccer_ball","🐱":"cat_face","🐶":"dog_face","🐘":"elephant","🐟":"fish","🍇":"grapes","🍦":"soft_ice_cream","🧃":"beverage_box","🪁":"kite","🦁":"lion","🌙":"crescent_moon","🪺":"nest_with_eggs","🍊":"tangerine","🐷":"pig_face","👸":"princess","🐰":"rabbit_face","☀":"sun","🐯":"tiger_face","☂":"umbrella","🎻":"violin","🍉":"watermelon","🦊":"fox","🪀":"yo-yo","🦓":"zebra","⭐":"star","🚗":"automobile","🐤":"baby_chick","🍓":"strawberry","🎈":"balloon","🐞":"lady_beetle","🍪":"cookie","🦕":"sauropod","🌸":"cherry_blossom","🚀":"rocket","🧸":"teddy_bear","✏":"pencil","🔢":"input_numbers","📝":"memo","📚":"books","🧮":"abacus","😊":"smiling_face_with_smiling_eyes","✅":"check_mark_button","⬜":"white_large_square","🎁":"wrapped_gift","💵":"dollar_banknote","✨":"sparkles","🎉":"party_popper","💛":"yellow_heart","🌟":"glowing_star","🐼":"panda","🐨":"koala","🐸":"frog","🐵":"monkey_face","🦄":"unicorn","🐲":"dragon_face","🙂":"slightly_smiling_face","🎂":"birthday_cake","👋":"waving_hand","🎨":"artist_palette","↩":"right_arrow_curving_left","🔁":"repeat_button","➕":"plus","🗑":"wastebasket","❓":"red_question_mark","🎮":"video_game","🥣":"bowl_with_spoon","👕":"t-shirt","🏫":"school","🍽":"fork_and_knife_with_plate","👂":"ear","🪥":"toothbrush","💬":"speech_balloon","🛌":"person_in_bed","😄":"grinning_face_with_smiling_eyes","😌":"relieved_face","😢":"crying_face","😠":"angry_face","😨":"fearful_face","😴":"sleeping_face","🔓":"unlocked","🌱":"seedling","📲":"mobile_phone_with_arrow","👛":"purse","📒":"ledger","⏱":"stopwatch","🛍":"shopping_bags","🎯":"bullseye","📅":"calendar","🏆":"trophy","📤":"outbox_tray","📥":"inbox_tray","⚠":"warning","ℹ":"information","🔒":"locked","🦖":"t-rex","🚂":"locomotive","🚲":"bicycle","🏖":"beach_with_umbrella","🧱":"brick","🛝":"playground_slide","🐜":"ant","💪":"flexed_biceps","🪓":"axe","✈":"airplane","🐊":"crocodile","🧑‍🚀":"astronaut","🥑":"avocado","👼":"baby_angel","⚓":"anchor","🚑":"ambulance","👽":"alien","🌰":"chestnut","🦇":"bat","🛏":"bed","🐝":"honeybee","🐦":"bird","⛵":"sailboat","📖":"open_book","📦":"package","👦":"boy","🚌":"bus","🐻":"bear","🍌":"banana","🍞":"bread","🔔":"bell","🥤":"cup_with_straw","🐮":"cow_face","🧢":"billed_cap","🥕":"carrot","🌽":"ear_of_corn","🦀":"crab","👑":"crown","🍬":"candy","🐫":"two-hump_camel","🕐":"one_oclock","☁":"cloud","🦆":"duck","🪆":"nesting_dolls","🚪":"door","🥁":"drum","👨":"man","🦌":"deer","🎲":"game_die","🐬":"dolphin","🍩":"doughnut","🐉":"dragon","👗":"dress","💎":"gem_stone","🧑‍⚕":"health_worker","🥚":"egg","👁":"eye","🦅":"eagle","🌍":"globe_showing_europe-africa","8⃣":"keycap_8","✉":"envelope","🧝":"person_elf","🍆":"eggplant","🛗":"elevator","📧":"e-mail","🐑":"ewe","🕚":"eleven_oclock","🪭":"folding_hand_fan","🦶":"foot","🔥":"fire","🚩":"triangular_flag","🍴":"fork_and_knife","5⃣":"keycap_5","🪶":"feather","🍟":"french_fries","🪰":"fly","😀":"grinning_face","4⃣":"keycap_4","🐐":"goat","👧":"girl","🦍":"gorilla","👻":"ghost","🦒":"giraffe","👓":"glasses","🌏":"globe_showing_asia-australia","🎸":"guitar","🪿":"goose","🟢":"green_circle","🧤":"gloves","🎩":"top_hat","🐔":"chicken","🐴":"horse_face","✋":"raised_hand","❤":"red_heart","🦛":"hippopotamus","🍯":"honey_pot","🔨":"hammer","🚁":"helicopter","🍔":"hamburger","🦔":"hedgehog","🪝":"hook","🤗":"hugging_face","🥵":"hot_face","🧊":"ice","🖋":"fountain_pen","🤒":"face_with_thermometer","🌿":"herb","😈":"smiling_face_with_horns","📏":"straight_ruler","🪻":"hyacinth","🏝":"desert_island","🐛":"bug","👶":"baby","💌":"love_letter","🦎":"lizard","🏔":"snow-capped_mountain","🫙":"jar","🛩":"small_airplane","👖":"jeans","🪼":"jellyfish","🤸":"person_cartwheeling","🧑‍⚖":"judge","🃏":"joker","😂":"face_with_tears_of_joy","🤹":"person_juggling","🧥":"coat","🐆":"leopard","🚙":"sport_utility_vehicle","🧩":"puzzle_piece","🔑":"key","🤴":"prince","💋":"kiss_mark","🧒":"child","🦘":"kangaroo","🐈":"cat","🔪":"kitchen_knife","🪢":"knot","🥝":"kiwi_fruit","⌨":"keyboard","🦵":"leg","🛶":"canoe","👘":"kimono","🍃":"leaf_fluttering_in_wind","🍋":"lemon","👄":"mouth","🪵":"wood","🪜":"ladder","🦙":"llama","🦞":"lobster","🍭":"lollipop","💻":"laptop","👩":"woman","🐭":"mouse_face","🥛":"glass_of_milk","🗺":"world_map","🥭":"mango","🎭":"performing_arts","🍈":"melon","🧲":"magnet","🍄":"mushroom","💰":"money_bag","📬":"open_mailbox_with_raised_flag","⛰":"mountain","🧁":"cupcake","👃":"nose","🥅":"goal_net","🥜":"peanuts","9⃣":"keycap_9","🌃":"night_with_stars","🥷":"ninja","📿":"prayer_beads","🪡":"sewing_needle","📰":"newspaper","📓":"notebook","🍜":"steaming_bowl","💅":"nail_polish","🦉":"owl","🐂":"ox","🐙":"octopus","🦦":"otter","🫒":"olive","🧅":"onion","1⃣":"keycap_1","🌊":"water_wave","👹":"ogre","🦪":"oyster","👌":"ok_hand","📂":"open_file_folder","📴":"mobile_phone_off","🚣":"person_rowing_boat","🖊":"pen","🍳":"cooking","🥧":"pie","🍐":"pear","🍕":"pizza","🐧":"penguin","🦜":"parrot","🍑":"peach","🎃":"jack-o-lantern","🍿":"popcorn","👮":"police_officer","🤫":"shushing_face","⚡":"high_voltage","🪙":"coin","🛑":"stop_sign","🌋":"volcano","🤢":"nauseated_face","🐀":"rat","🔴":"red_circle","🌧":"cloud_with_rain","💍":"ring","🪨":"rock","🌹":"rose","🤖":"robot","🌈":"rainbow","📻":"radio","🏃":"person_running","🍚":"cooked_rice","🐓":"rooster","🧦":"socks","🐍":"snake","🚢":"ship","👟":"running_shoe","🦭":"seal","🐌":"snail","🕷":"spider","🧂":"salt","6⃣":"keycap_6","🥪":"sandwich","🌳":"deciduous_tree","🚚":"delivery_truck","🐢":"turtle","🦷":"tooth","⛺":"tent","2⃣":"keycap_2","🔟":"keycap_10","🚕":"taxi","🍅":"tomato","🍵":"teacup_without_handle","👅":"tongue","⬆":"up_arrow","⬇":"down_arrow","🛸":"flying_saucer","😞":"disappointed_face","🥋":"martial_arts_uniform","🪕":"banjo","⚱":"funeral_urn","😟":"worried_face","🧔":"person_beard","🙃":"upside-down_face","🚐":"minibus","🏺":"amphora","🦺":"safety_vest","🐕":"dog","🧛":"person_vampire","📹":"video_camera","🏘":"houses","🗳":"ballot_box_with_ballot","🥦":"broccoli","🟣":"purple_circle","💝":"heart_with_ribbon","🗣":"speaking_head","✌":"victory_hand","🕸":"spider_web","💦":"sweat_droplets","🪱":"worm","🐺":"wolf","🐳":"spouting_whale","⌚":"watch","💧":"droplet","🪟":"window","🛞":"wheel","🧙":"person_mage","🌬":"wind_face","🪽":"wing","🚶":"person_walking","🔧":"wrench","🕯":"candle","⏭":"next_track_button","🎷":"saxophone","🧰":"toolbox","🎶":"musical_notes","🐃":"water_buffalo","🧶":"yarn","🥱":"yawning_face","🟡":"yellow_circle","🍠":"roasted_sweet_potato","🛥":"motor_boat","👉":"backhand_index_pointing_right","😋":"face_savoring_food","🧘":"person_in_lotus_position","0⃣":"keycap_0","🤐":"zipper-mouth_face","🧟":"person_zombie","〰":"wavy_dash","🚧":"construction","🥒":"cucumber","🤪":"zany_face","🔍":"magnifying_glass_tilted_left","♈":"aries","🥈":"2nd_place_medal","🏅":"sports_medal","👨‍👩‍👦":"people_hugging","👫":"people_hugging","🤥":"lying_face","📺":"television","🤲":"palms_up_together","🙉":"hear-no-evil_monkey","👍":"thumbs_up","😤":"face_with_steam_from_nose","👊":"oncoming_fist"};
 const EMO_RE = /[0-9#*]️?⃣|\p{Extended_Pictographic}️?(?:‍\p{Extended_Pictographic}️?)*/gu;
 const EMO_TEST = new RegExp(EMO_RE.source, 'u');
 const EMO_SKIP = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT', 'OPTION', 'SELECT', 'TITLE']);
@@ -1248,6 +1257,19 @@ const HABITS = [
   {id:'bedtime',   e:'🛌', en:'Go to bed on time',         zh:'按时睡觉',         q:'Did you go to bed on time?'},
 ];
 const HABIT_STARS = 1, MOOD_STARS = 1;
+const BAD_STARS = 10;   // stars taken away for each "not behaving well" a parent ticks
+const BADS = [
+  {id:'hit',      e:'👊', en:'Hitting or pushing',          zh:'打人、推人'},
+  {id:'tantrum',  e:'😤', en:'Throwing a tantrum',          zh:'发脾气、哭闹'},
+  {id:'nolisten', e:'🙉', en:'Not listening',               zh:'不听话'},
+  {id:'rude',     e:'🗣️', en:'Yelling or rude words',       zh:'大喊大叫、说不礼貌的话'},
+  {id:'grab',     e:'🤲', en:'Grabbing toys, not sharing',  zh:'抢玩具、不分享'},
+  {id:'food',     e:'🍽️', en:'Not eating meals well',       zh:'不好好吃饭'},
+  {id:'screen',   e:'📺', en:"Won't stop TV or iPad",       zh:'看电视、玩平板不肯停'},
+  {id:'lie',      e:'🤥', en:'Telling a lie',               zh:'说谎'},
+  {id:'unsafe',   e:'🏃', en:'Running off, not safe',       zh:'乱跑、不安全'},
+  {id:'bed',      e:'🛌', en:"Won't go to bed",             zh:'不肯睡觉'},
+];
 const MOODS = [
   {id:'happy',  e:'😄', en:'Happy',  zh:'开心', sayEn:"Yay! I'm happy you're happy!",                              sayZh:'你开心，我也开心！'},
   {id:'calm',   e:'😌', en:'Calm',   zh:'平静', sayEn:'Nice and calm. That feels good!',                            sayZh:'平平静静，真好！'},
@@ -1256,7 +1278,25 @@ const MOODS = [
   {id:'scared', e:'😨', en:'Scared', zh:'害怕', sayEn:"It's okay to feel scared. Tell Mommy or Daddy what scared you.", sayZh:'害怕也没关系，告诉爸爸妈妈吧。'},
   {id:'tired',  e:'😴', en:'Tired',  zh:'累了', sayEn:"You're tired. Time for a good rest soon!",                   sayZh:'累了吧，等一下好好休息！'},
 ];
-const todayLog = () => Object.assign({habits: [], mood: null}, store.get('daylog', {})[isoDay()]);
+const todayLog = () => Object.assign({habits: [], mood: null, bad: {}}, store.get('daylog', {})[isoDay()]);
+// "not behaving well": take stars away (never below 0); unticking gives back exactly what was taken
+function loseStars(n){
+  const lost = Math.min(n, stars);
+  stars -= lost; saveStars();
+  const s = document.getElementById('starCount');
+  if (s){ s.textContent = stars; s.parentElement.classList.remove('bump'); void s.offsetWidth; s.parentElement.classList.add('bump'); }
+  return lost;
+}
+function giveBack(n){
+  stars += n; saveStars();
+  const s = document.getElementById('starCount'); if (s) s.textContent = stars;
+}
+function minusFloat(el, n){
+  const r = el.getBoundingClientRect(), f = document.createElement('span');
+  f.className = 'minus-float'; f.textContent = `−${n} ⭐`;
+  f.style.left = (r.left + r.width / 2) + 'px'; f.style.top = (r.top + r.height / 2) + 'px';
+  document.body.appendChild(f); setTimeout(() => f.remove(), 1400);
+}
 function takeStar(){   // a parent un-ticks a habit: give that star back
   stars = Math.max(0, stars - 1); saveStars();
   logToday(e => { e.stars = Math.max(0, e.stars - 1); });
@@ -1279,6 +1319,12 @@ function habits(){
       </div>
       <div class="habit-grid">${HABITS.map(h => `<button class="habit chunky" data-h="${h.id}">
         <span class="h-e">${h.e}</span><span class="h-t">${h.en}<small>${h.zh}</small></span><span class="h-c"></span></button>`).join('')}</div>
+      <div class="habit-head bad-head">
+        <h3>Not behaving well <span class="zh">要改进的地方</span> <b id="badCount"></b></h3>
+        <span class="bad-note">Each one −${BAD_STARS} ⭐ <span class="zh">每项扣${BAD_STARS}颗星</span></span>
+      </div>
+      <div class="habit-grid">${BADS.map(b => `<button class="habit bad chunky" data-b="${b.id}">
+        <span class="h-e">${b.e}</span><span class="h-t">${b.en}<small>${b.zh}</small></span><span class="h-c"></span></button>`).join('')}</div>
     </main>`;
   document.getElementById('homeBtn').onclick = () => { sfx.pop(); home(); };
   const draw = () => {
@@ -1290,6 +1336,13 @@ function habits(){
       b.querySelector('.h-c').textContent = on ? '✅' : parent ? '⬜' : '';
     });
     document.getElementById('habitCount').textContent = `${t.habits.length} / ${HABITS.length} ⭐`;
+    const bad = t.bad || {}, badIds = Object.keys(bad), badLost = Object.values(bad).reduce((a, b) => a + b, 0);
+    $app.querySelectorAll('.habit.bad').forEach(b => {
+      const on = b.dataset.b in bad;
+      b.classList.toggle('on', on);
+      b.querySelector('.h-c').textContent = on ? `−${bad[b.dataset.b]}` : parent ? '⬜' : '';
+    });
+    document.getElementById('badCount').textContent = badIds.length ? `${badIds.length} · −${badLost} ⭐` : '0 👍';
     const pb = document.getElementById('parentBtn');
     pb.classList.toggle('unlocked', parent);
     pb.innerHTML = parent ? '🔓 Parent mode on<span class="zh">家长模式</span>' : '👨‍👩‍👦 Parent check<span class="zh">家长打勾</span>';
@@ -1319,6 +1372,25 @@ function habits(){
       say(`${pe} ${h.en}!`, `${pz}${h.zh}！`);
       if (todayLog().habits.length === HABITS.length)
         later(() => cheer('🌱 10 / 10 🌟', 'All your good habits today! Amazing!', '今天所有好习惯都做到了！太棒了！'), 1500);
+    }
+    draw();
+  });
+  // not behaving well: he can tap to hear it; only a parent can tick it (−10 stars each)
+  $app.querySelectorAll('.habit.bad').forEach(b => b.onclick = () => {
+    const x = BADS.find(y => y.id === b.dataset.b);
+    sfx.pop();
+    if (!parent){ say(`${x.en}. Let's try not to do that!`, `${x.zh}，我们要改正哦！`); return; }
+    const t = todayLog(), bad = t.bad || {};
+    if (x.id in bad){                      // parent un-ticks: give the stars back
+      const n = bad[x.id];
+      logToday(e => { e.bad = Object.assign({}, e.bad); delete e.bad[x.id]; });
+      giveBack(n); sfx.yay();
+      say(`Okay, ${n} stars back.`, `好的，还给你${n}颗星星。`);
+    } else {
+      const n = loseStars(BAD_STARS);
+      logToday(e => { e.bad = Object.assign({}, e.bad, {[x.id]: n}); });
+      sfx.oops(); b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); minusFloat(b, n);
+      say(`Oh no. ${x.en}. Minus ${n} stars. Let's do better tomorrow!`, `哎呀，${x.zh}。扣${n}颗星星。明天要做得更好哦！`);
     }
     draw();
   });
@@ -1410,6 +1482,7 @@ function bankRecords(history, paidTotal){
   const dayName = k => new Date(k + 'T00:00').toLocaleDateString(undefined, {weekday: 'short', month: 'numeric', day: 'numeric'});
   const yes = (v, txt) => v ? `<span class="ok">✅ ${txt}</span>` : '<span class="no">—</span>';
   const totalStars = days.reduce((a, k) => a + log[k].stars, 0);
+  const totalLost = days.reduce((a, k) => a + Object.values(log[k].bad || {}).reduce((x, y) => x + y, 0), 0);
   const sumTime = t => Object.values(t || {}).reduce((a, b) => a + b, 0);
   const totalTime = days.reduce((a, k) => a + sumTime(log[k].time), 0);
   const timeCell = t => {
@@ -1429,6 +1502,7 @@ function bankRecords(history, paidTotal){
       <td><b class="${done === 3 ? 'all' : ''}">${done}/3</b></td>
       <td class="time-cell">${timeCell(e.time)}</td>
       <td>${(e.habits || []).length ? `<b class="${e.habits.length === HABITS.length ? 'all' : ''}">${e.habits.length}/${HABITS.length}</b>` : '<span class="no">—</span>'}</td>
+      <td>${Object.keys(e.bad || {}).length ? `<span class="bad-cell">${Object.keys(e.bad).map(id => (BADS.find(b => b.id === id) || {e: '⚠️'}).e).join('')} −${Object.values(e.bad).reduce((a, b) => a + b, 0)} ⭐</span>` : '<span class="no">—</span>'}</td>
       <td class="mood-cell">${e.mood ? MOODS.find(m => m.id === e.mood).e : '<span class="no">—</span>'}</td>
       <td>⭐ ${e.stars}${e.bonus ? `<small class="bonus"> incl. 🎁+${Object.values(e.bonus).reduce((a, b) => a + b, 0)}</small>` : ''}</td>
       <td>${e.paid ? `💵 $${e.paid}` : '<span class="no">—</span>'}</td></tr>`;
@@ -1436,9 +1510,9 @@ function bankRecords(history, paidTotal){
   return `<section class="records">
     <h3>📒 Daily record <span class="zh">每日记录</span></h3>
     ${days.length ? `<div class="rec-wrap"><table class="rec">
-      <thead><tr><th>Day 日期</th><th>✏️ Write 写字</th><th>🍎 Words 单词</th><th>🧮 Math 数学</th><th>Tasks 任务</th><th>⏱ Time 用时</th><th>🌱 Habits 习惯</th><th>Mood 心情</th><th>Stars earned 获得星星</th><th>Cashed out 兑换</th></tr></thead>
+      <thead><tr><th>Day 日期</th><th>✏️ Write 写字</th><th>🍎 Words 单词</th><th>🧮 Math 数学</th><th>Tasks 任务</th><th>⏱ Time 用时</th><th>🌱 Habits 习惯</th><th>⚠️ Not good 要改进</th><th>Mood 心情</th><th>Stars earned 获得星星</th><th>Cashed out 兑换</th></tr></thead>
       <tbody>${rows}</tbody>
-      <tfoot><tr><td class="d">Total 合计</td><td colspan="4"></td><td class="time-cell"><b>${fmtTime(totalTime)}</b></td><td colspan="2"></td><td>⭐ ${totalStars}</td><td>💵 $${paidTotal}</td></tr></tfoot>
+      <tfoot><tr><td class="d">Total 合计</td><td colspan="4"></td><td class="time-cell"><b>${fmtTime(totalTime)}</b></td><td colspan="3"></td><td>⭐ ${totalStars}${totalLost ? ` <span class="bad-cell">−${totalLost}</span>` : ''}</td><td>💵 $${paidTotal}</td></tr></tfoot>
     </table></div>` : '<p class="no">No days recorded yet. 还没有记录。</p>'}
     <h3>💵 Cash-outs <span class="zh">兑换记录</span></h3>
     ${history.length ? `<ul class="cash-list">${history.slice().reverse().map(h =>
