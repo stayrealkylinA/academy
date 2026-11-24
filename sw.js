@@ -1,6 +1,6 @@
 // Keeps the app working offline. Shows the saved copy right away and
 // quietly fetches the newest version in the background for next time.
-const CACHE = 'academy-v17';
+const CACHE = 'academy-v18';
 // 3D pictures live in their own store, so app updates don't download them again
 const PICS = 'academy-pics-v1';
 const FILES = ['./', './index.html', './manifest.webmanifest',
@@ -16,8 +16,9 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
-  // pictures never change: use the saved one, download only if missing
-  if (new URL(e.request.url).pathname.includes('/emoji/')){
+  // pictures and voice clips never change: use the saved one, download only if missing
+  const path = new URL(e.request.url).pathname;
+  if (path.includes('/emoji/') || path.includes('/voice/')){   // pictures + recorded voice clips
     e.respondWith(caches.open(PICS).then(async cache => {
       const hit = await cache.match(e.request, {ignoreSearch: true});
       if (hit) return hit;
