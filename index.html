@@ -464,7 +464,7 @@ body.lang-zh .tile-zh{font-size:clamp(22px,2.8vw,32px);opacity:1}
 .hint-scene[hidden]{display:none}
 @keyframes stampin{from{transform:rotate(-12deg) scale(2.4);opacity:0}to{transform:rotate(-12deg) scale(1);opacity:1}}
 @keyframes dotpulse{50%{transform:scale(1.6)}}
-@keyframes breathe{50%{transform:scale(1.12)}}
+@keyframes breathe{50%{transform:scale(1.05)}}
 @media (max-width:560px){.crayon{width:34px;height:34px}.crayons{gap:5px}}
 
 /* sparkles */
@@ -483,6 +483,18 @@ body.lang-zh .tile-zh{font-size:clamp(22px,2.8vw,32px);opacity:1}
   .home-grid{grid-template-columns:1fr 1fr}
   .round{width:54px;height:54px;font-size:26px}
   .top{min-height:58px}
+}
+/* calm motion: slow, small pulses that stop after a few beats (easier on the eyes) */
+.badge{animation:breathe 2.6s ease-in-out 3}
+.daily.due{animation:breathe 2.6s ease-in-out 3}
+.ok-btn.ready,.round.ready,#tNext.ready{animation:breathe 2.4s ease-in-out 4}
+.slot.now{animation:breathe 2.4s ease-in-out 4}
+.ob-big{animation:wiggle 1.6s ease-in-out 3}
+/* phones: keep the top bar tidy */
+@media (max-width:560px){
+  .logo.sm{display:none}
+  #langBtn{white-space:nowrap;padding:8px 12px;font-size:14px}
+  .hello{font-size:22px}
 }
 </style>
 </head>
