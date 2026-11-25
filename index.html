@@ -539,6 +539,22 @@ button.piggy{background:none;border:0;cursor:pointer}
 .interest-note .zh{display:block}
 .interest-note .today-int{display:inline-block;margin-top:4px;background:#fff;border-radius:999px;padding:2px 10px}
 .cash-split .grow{display:block;font-size:13px;color:#2b8a3e;font-weight:800}
+.parent-ok{font-size:14px;padding:8px 12px;background:#fff9db}
+.parent-ok[hidden]{display:none}
+/* math levels */
+.levels{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:6px 0 2px}
+.level{background:var(--bg);border-radius:20px;padding:10px 18px;font-weight:900;font-size:18px;display:flex;flex-direction:column;align-items:center}
+.level .zh{display:inline;font-size:15px}
+.level small{font-size:13px;color:var(--muted);font-weight:800}
+.level.on{background:#d3f9d8;outline:3px solid #2b8a3e}
+.level-note{font-size:13px;color:var(--muted);font-weight:800;margin:4px 0 8px}
+.pad.wide{width:clamp(260px,40vw,400px)}
+.eq.long{font-size:clamp(40px,7vw,84px);white-space:nowrap}
+.write-row{flex-wrap:wrap;justify-content:center}
+.blocks{display:flex;align-items:flex-end;gap:4px;flex-wrap:wrap;justify-content:center;max-width:300px;background:#fff;border-radius:20px;padding:10px;box-shadow:0 5px 0 var(--edge)}
+.blocks .ten{width:12px;height:90px;border-radius:4px;background:repeating-linear-gradient(#4dabf7 0 8px,#fff 8px 9px);border:1px solid #1c7ed6}
+.blocks .ones{display:grid;grid-template-columns:repeat(2,12px);gap:3px;margin-left:4px}
+.blocks .ones i{width:12px;height:12px;border-radius:3px;background:#ff922b;border:1px solid #e8590c}
 </style>
 </head>
 <body>
@@ -1804,7 +1820,7 @@ function bankRecords(history, paidTotal){
       <td class="d">${dayName(k)}</td>
       <td>${twN ? `<span class="${twN === WRITE_KINDS.length ? 'ok' : ''}">${WRITE_KINDS.map(([k, ic]) => e.tw[k] ? ic : '').join('')} ${twN}/${WRITE_KINDS.length}</span>` : '<span class="no">—</span>'}</td>
       <td>${yes(e.words != null, e.words != null ? `${e.words}/${GAME_LEN}` : '')}</td>
-      <td>${yes(e.math != null, e.math != null ? `${e.math}/${MATH_LEN}` : '')}</td>
+      <td>${yes(e.math != null, e.math != null ? `${e.math}/${MATH_LEN}${e.mathLvl > 1 ? ` <small>L${e.mathLvl}</small>` : ''}` : '')}</td>
       <td><b class="${done === 3 ? 'all' : ''}">${done}/3</b></td>
       <td class="time-cell">${timeCell(e.time)}</td>
       <td>${(e.habits || []).length ? `<b class="${e.habits.length === HABITS.length ? 'all' : ''}">${e.habits.length}/${HABITS.length}</b>` : '<span class="no">—</span>'}</td>
@@ -3106,17 +3122,32 @@ const DIGIT_ALTS = {
   2: [G(72, st(arc(36,46,26,26,170,-20), ln(60,56,10,120,64,120)))],
   3: [G(68, st(ln(10,20,58,20,30,62), arc(32,92,26,28,90,-150)))],                         // flat-top 3
   4: [G(72, ln(14,20,14,72,62,72), ln(52,20,52,120)), G(72, ln(46,20,8,88,66,88,46,88,46,120))],  // open 4; one stroke
-  5: [G(70, ln(16,20,14,64), st(ln(14,64,30,60), arc(34,92,26,28,100,-150)), ln(16,20,58,20))],  // three strokes
+  5: [G(70, ln(16,20,14,64), st(ln(14,64,30,60), arc(34,92,26,28,100,-150)), ln(16,20,58,20)),   // three strokes
+      G(70, st(ln(16,22,16,58), arc(36,88,24,30,140,-150)), ln(16,22,58,22)),                     // stem + round belly, bar added last
+      G(70, ln(14,20,58,20), st(ln(16,20,16,60), arc(36,90,26,28,130,-160))),                     // bar first, then stem + belly
+      G(70, st(arc(36,42,24,20,30,250), arc(36,90,26,28,90,-170)))],                              // curvy, S-like 5
   6: [G(72, st(arc(40,58,26,38,70,190), arc(38,94,24,26,180,540)))],
   7: [G(70, ln(8,20,62,20,26,120), ln(20,70,56,70)), G(70, ln(8,20,62,20,30,120))],           // with a bar; straighter
   8: [G(72, st(arc(36,44,22,24,0,270), arc(36,94,26,26,90,-270)))],                        // one-stroke 8
   9: [G(72, arc(34,46,24,26,0,360), ln(58,46,58,120)), G(72, st(arc(36,46,24,26,10,370), arc(28,90,30,30,0,-70)))],  // circle + stick; curly tail
 };
 // every model for a number (all combinations of the ways to write each digit)
+// his own way of writing a number, learned when a parent taps "It's right" (fitted into the model box)
+const myDigitForms = ch => (store.get('digit.models', {})[ch] || []).map(m => ({w: m.w, s: m.s}));
+function learnDigit(d, ink){
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  ink.forEach(st => st.forEach(([x, y]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }));
+  const k = 100 / Math.max(y1 - y0, 1);
+  const strokes = ink.filter(st => st.length > 1).map(st => st.map(([x, y]) => [+(8 + (x - x0) * k).toFixed(1), +(20 + (y - y0) * k).toFixed(1)]));
+  if (!strokes.length) return;
+  const all = store.get('digit.models', {});
+  all[d] = [{w: Math.round((x1 - x0) * k + 16), s: strokes}, ...(all[d] || [])].slice(0, 3);
+  store.set('digit.models', all);
+}
 function numberModels(v){
   let models = [[]], x = 0;
   for (const ch of String(v)){
-    const forms = [DIGITS[ch], ...(DIGIT_ALTS[ch] || [])], next = [];
+    const forms = [DIGITS[ch], ...(DIGIT_ALTS[ch] || []), ...myDigitForms(ch)], next = [];
     let w = 0;
     for (const m of models) for (const g of forms){
       next.push(m.concat(g.s.map(s => s.map(([a, b]) => [a + x, b])))); w = Math.max(w, g.w);
@@ -3135,6 +3166,31 @@ function numberScore(ink, v){
     if (g.score > best) best = g.score;
   }
   return best;
+}
+// is his writing the answer? Two-digit answers are split into tens and ones, and each digit is checked on its own
+// (tested: right answers ~100%, look-alike wrong ones ~1-2%; a parent can still confirm)
+const NUM_MARGIN = 0.03;
+function numberOk(ink, ans, maxN){
+  const mine = numberScore(ink, ans);
+  let other = 0;
+  for (let v = 0; v <= maxN; v++) if (v !== ans) other = Math.max(other, numberScore(ink, v));
+  return mine >= 0.42 && mine >= other - NUM_MARGIN;
+}
+function splitDigits(ink){
+  const st = ink.filter(s => s.length).map(s => { let a = 1e9, b = -1e9; s.forEach(([x]) => { a = Math.min(a, x); b = Math.max(b, x); }); return {s, a, b, c: (a + b) / 2}; }).sort((p, q) => p.c - q.c);
+  let best = null;
+  for (let k = 1; k < st.length; k++){
+    const L = st.slice(0, k), R = st.slice(k);
+    const gap = Math.min(...R.map(o => o.a)) - Math.max(...L.map(o => o.b));
+    if (!best || gap > best.gap) best = {gap, L: L.map(o => o.s), R: R.map(o => o.s)};
+  }
+  return best;
+}
+function answerOk(ink, ans, maxN){
+  if (ans < 10 || maxN < 10) return numberOk(ink, ans, maxN);
+  const sp = splitDigits(ink);
+  if (!sp || sp.gap < -4) return numberOk(ink, ans, maxN);     // digits run together: read it as a whole
+  return numberOk(sp.L, Math.floor(ans / 10), 9) && numberOk(sp.R, ans % 10, 9);
 }
 function inkSize(ink){
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
@@ -3155,14 +3211,48 @@ function readNumber(ink, maxN = 10){
   }
   return best;
 }
+// math level, chosen by a parent: 1 = + and − within 10, 2 = numbers under 100
+const MATH_LEVELS = [
+  {n: 1, en: 'Level 1', zh: '第一级', sub: 'within 10', subZh: '10以内'},
+  {n: 2, en: 'Level 2', zh: '第二级', sub: 'under 100', subZh: '100以内'},
+];
+const mathLevel = () => store.get('math.level', 1) === 2 ? 2 : 1;
+/* Level 2 — 20 questions, easy → hard, + and − take turns:
+   1–5   within 20                     (pictures + 3 answer buttons)
+   6–10  two-digit ± one-digit, e.g. 34 + 5   (blocks + 3 answer buttons)
+   11–15 whole tens, e.g. 30 + 40      (he writes the answer)
+   16–20 two-digit ± two-digit, e.g. 23 + 14 (he writes the answer)
+   no carrying or borrowing, every answer under 100 */
+function mathProblem2(n){
+  const sub = n % 2 === 1, part = Math.floor(n / 5);
+  const r = (lo, hi) => lo + rand(hi - lo + 1);
+  let a, b;
+  if (part === 0){
+    if (sub){ a = r(11, 20); b = r(1, Math.min(9, a - 1)); }
+    else { a = r(5, 15); b = r(2, 20 - a); }
+  } else if (part === 1){
+    const t = r(2, 8), o = r(sub ? 2 : 0, sub ? 9 : 7);
+    a = t * 10 + o; b = sub ? r(1, o) : r(1, 9 - o);
+  } else if (part === 2){
+    if (sub){ a = r(5, 9) * 10; b = r(1, a / 10 - 1) * 10; }
+    else { a = r(1, 7) * 10; b = r(1, 9 - a / 10) * 10; }
+  } else {
+    if (sub){ const ta = r(3, 9), oa = r(2, 9); a = ta * 10 + oa; b = r(1, ta - 1) * 10 + r(1, oa); }
+    else { const ta = r(1, 7), oa = r(1, 7); a = ta * 10 + oa; b = r(1, 8 - ta) * 10 + r(1, 9 - oa); }
+  }
+  return sub ? {a, b, op: '−', ans: a - b} : {a, b, op: '+', ans: a + b};
+}
 function mathProblem(n){
+  if (mathLevel() === 2) return mathProblem2(n);
   const sub = n % 2 === 1;                       // + − + − … all the way through
   const max = Math.floor(n / 5) % 2 === 0 ? 5 : 10; // within 5, then within 10 (for both halves)
   if (sub){ const a = 2 + rand(max - 1), b = 1 + rand(a - 1); return {a, b, op: '−', ans: a - b}; }
   const a = 1 + rand(max - 1), b = 1 + rand(max - a);
   return {a, b, op: '+', ans: a + b};
 }
+const tensOnes = v => `<div class="group-wrap"><div class="blocks">${'<span class="ten"></span>'.repeat(Math.floor(v / 10))}${v % 10 ? `<span class="ones">${'<i></i>'.repeat(v % 10)}</span>` : ''}</div><div class="group-num">${v}</div></div>`;
 function mathScene(p, e){
+  if (p.a > 20) return `${tensOnes(p.a)}<div class="op">${p.op}</div>${tensOnes(p.b)}<div class="op">=</div><div class="q">?</div>`;
   if (p.op === '−'){
     const items = Array.from({length: p.a}, (_, i) => `<span class="obj ${i >= p.ans ? 'gone' : ''}">${e}</span>`).join('');
     return `<div class="group-wrap"><div class="group">${items}</div></div>`;
@@ -3171,17 +3261,17 @@ function mathScene(p, e){
   return `${g(p.a)}<div class="op">+</div>${g(p.b)}<div class="op">=</div><div class="q">?</div>`;
 }
 const mathSay = p => p.op === '+'
-  ? [`${NUM_EN[p.a]} plus ${NUM_EN[p.b]} equals?`, `${NUM_ZH[p.a]}加${NUM_ZH[p.b]}等于几？`]
-  : [`${NUM_EN[p.a]} take away ${NUM_EN[p.b]}. How many are left?`, `${NUM_ZH[p.a]}减${NUM_ZH[p.b]}，还剩几个？`];
+  ? [`${numEn(p.a)} plus ${numEn(p.b)} equals?`, `${numZh(p.a)}加${numZh(p.b)}等于几？`]
+  : [`${numEn(p.a)} take away ${numEn(p.b)}. How many are left?`, `${numZh(p.a)}减${numZh(p.b)}，还剩几个？`];
 const mathYes = p => p.op === '+'
-  ? [`${p.a} plus ${p.b} is ${p.ans}!`, `${NUM_ZH[p.a]}加${NUM_ZH[p.b]}等于${NUM_ZH[p.ans]}！`]
-  : [`${p.a} take away ${p.b} is ${p.ans}!`, `${NUM_ZH[p.a]}减${NUM_ZH[p.b]}等于${NUM_ZH[p.ans]}！`];
+  ? [`${p.a} plus ${p.b} is ${p.ans}!`, `${numZh(p.a)}加${numZh(p.b)}等于${numZh(p.ans)}！`]
+  : [`${p.a} take away ${p.b} is ${p.ans}!`, `${numZh(p.a)}减${numZh(p.b)}等于${numZh(p.ans)}！`];
 
 /* a small handwriting pad; returns its strokes (lists of points) */
 let penSeenGlobal = false;
-function inkPad(el, onInk){
+function inkPad(el, onInk, wide){
   const NS = 'http://www.w3.org/2000/svg';
-  el.innerHTML = `<svg viewBox="0 0 110 140" preserveAspectRatio="xMidYMid meet">
+  el.innerHTML = `<svg viewBox="0 0 ${wide ? 200 : 110} 140" preserveAspectRatio="xMidYMid meet">
     <line x1="-500" x2="600" y1="20" y2="20" class="ln"/><line x1="-500" x2="600" y1="70" y2="70" class="ln ln-mid"/>
     <line x1="-500" x2="600" y1="120" y2="120" class="ln ln-base"/><g class="t-ink"></g></svg>`;
   const svg = el.firstElementChild, inkG = svg.querySelector('.t-ink');
@@ -3222,11 +3312,19 @@ function mathHome(){
         <div class="wc-emoji">${played ? '✅' : '🧮'}</div>
         <p class="big-txt">${played ? `Today: ${g.score} / ${MATH_LEN}` : "Today's math game"}<span class="zh">${played ? `今天答对了${g.score}题` : '今天的数学游戏'}</span></p>
         <p class="sub-txt">${MATH_LEN} questions · easy → hard · last ${MATH_LEN - MATH_CHOICE}: write the answer ✏️<br>${MATH_LEN}道题 · 由易到难 · 后${MATH_LEN - MATH_CHOICE}道自己写答案</p>
+        <div class="levels">${MATH_LEVELS.map(l => `<button class="level chunky ${l.n === mathLevel() ? 'on' : ''}" data-l="${l.n}">${l.en} <span class="zh">${l.zh}</span><small>${l.sub} · ${l.subZh}</small></button>`).join('')}</div>
+        <p class="level-note">👨‍👩‍👦 Parents choose the level · 家长选择级别</p>
         <button class="ok-btn chunky" id="goMath">${played ? '🔁 Play again' : '▶️ Start'}<span class="zh">${played ? '再玩一次' : '开始'}</span></button>
       </div>
     </main>`;
   document.getElementById('homeBtn').onclick = () => { sfx.pop(); home(); };
   document.getElementById('goMath').onclick = () => { sfx.pop(); mathGame(); };
+  $app.querySelectorAll('.level').forEach(b => b.onclick = () => {
+    const l = +b.dataset.l;
+    if (l === mathLevel()) return;
+    sfx.pop();
+    parentGate(() => { store.set('math.level', l); mathHome(); });
+  });
   say(played ? `You already did today's math. Great job!` : `Let's do today's math! ${MATH_LEN} questions.`,
       played ? '今天的数学做完了，真棒！' : `我们来做今天的数学吧！${MATH_LEN}道题。`);
 }
@@ -3250,12 +3348,12 @@ function mathGame(){
 
   function askChoice(){
     const p = mathProblem(n), e = pick(THINGS), [en, zh] = mathSay(p);
-    const opts = nearbyNumbers(p.ans, 3, p.op === '+' ? 1 : 0, 10);
+    const opts = nearbyNumbers(p.ans, 3, p.op === '+' ? 1 : 0, mathLevel() === 2 ? 99 : 10);
     stage.innerHTML = `${dots()}
       <div class="prompt"><button class="round chunky speak" aria-label="Say it again">${IC.speak}</button>
         <div class="prompt-text">${p.a} ${p.op} ${p.b} = ?<span class="zh">${zh}</span></div></div>
       <div class="scene">${mathScene(p, e)}</div>
-      <div class="choices">${opts.map(x => `<button class="choice chunky" data-v="${x}">${x}<small>${NUM_ZH[x]}</small></button>`).join('')}</div>`;
+      <div class="choices">${opts.map(x => `<button class="choice chunky" data-v="${x}">${x}<small>${numZh(x)}</small></button>`).join('')}</div>`;
     stage.querySelector('.speak').onclick = () => { sfx.pop(); say(en, zh); };
     say(en, zh);
     let locked = false;
@@ -3268,26 +3366,44 @@ function mathGame(){
 
   function askWrite(){
     const p = mathProblem(n), e = pick(THINGS), [en, zh] = mathSay(p);
+    const big = mathLevel() === 2, maxN = big ? 99 : 10;    // level 2: answers up to 99
     let tries = 0, locked = false;
     stage.innerHTML = `${dots()}
       <div class="prompt"><button class="round chunky speak" aria-label="Say it again">${IC.speak}</button>
         <div class="prompt-text">Write the answer!<span class="zh">自己写答案！</span></div></div>
       <div class="write-row">
-        <div class="eq">${p.a} ${p.op} ${p.b} =</div>
-        <div class="pad" id="pad"></div>
+        <div class="eq ${big ? 'long' : ''}">${p.a} ${p.op} ${p.b} =</div>
+        <div class="pad ${big ? 'wide' : ''}" id="pad"></div>
       </div>
       <div class="scene hint-scene" hidden>${mathScene(p, e)}</div>
       <div class="toolbar">
         <button class="round chunky" id="mHint" aria-label="Show pictures">${IC.bulb}</button>
         <button class="round chunky" id="mClear" aria-label="Erase">${IC.erase}</button>
         <button class="ok-btn chunky" id="mOk">✅ Check<span class="zh">检查</span></button>
+        <button class="pill chunky parent-ok" id="mParent" hidden>👨‍👩‍👦 It's right<span class="zh">家长：写对了</span></button>
       </div>`;
     const padEl = stage.querySelector('#pad'), okBtn = stage.querySelector('#mOk');
-    const pad = inkPad(padEl, () => okBtn.classList.add('ready'));
+    const pad = inkPad(padEl, () => okBtn.classList.add('ready'), big);
     stage.querySelector('.speak').onclick = () => { sfx.pop(); say(`${en} Write the answer!`, `${zh}写出答案！`); };
     stage.querySelector('#mHint').onclick = () => { sfx.pop(); stage.querySelector('.hint-scene').hidden = false; };
     stage.querySelector('#mClear').onclick = () => { sfx.pop(); pad.clear(); okBtn.classList.remove('ready'); };
     say(`${en} Write the answer!`, `${zh}写出答案！`);
+    let lastInk = null, confirmed = false;
+    stage.querySelector('#mParent').onclick = () => {
+      if (confirmed || !lastInk) return;
+      sfx.pop();
+      parentGate(() => {
+        if (confirmed) return;
+        confirmed = true; locked = true;
+        // next time his way of writing it is known
+        if (p.ans < 10) learnDigit(String(p.ans), lastInk);
+        else { const sp = splitDigits(lastInk); if (sp && sp.gap >= -4){ learnDigit(String(Math.floor(p.ans / 10)), sp.L); learnDigit(String(p.ans % 10), sp.R); } }
+        stage.querySelector('#mParent').hidden = true;
+        padEl.querySelectorAll('.pad-ans').forEach(e => e.remove());
+        padEl.classList.add('locked', 'good');
+        right(padEl, p);
+      });
+    };
     okBtn.onclick = () => {
       if (locked) return;
       if (!pad.strokes.length) return say('Write your answer first!', '先写答案！');
@@ -3295,12 +3411,11 @@ function mathGame(){
       // too small to read: ask for bigger, don't count it as a try
       if (inkSize(pad.strokes) < 22){ sfx.oops(); return say('Write it bigger!', '写大一点！'); }
       // lenient for little hands: right if it looks like the answer at least about as much as like any other number
-      const mine = numberScore(pad.strokes, p.ans);
-      let other = 0;
-      for (let v = 0; v <= 10; v++) if (v !== p.ans) other = Math.max(other, numberScore(pad.strokes, v));
-      const ok = mine >= 0.42 && mine >= other - 0.06;   // tested: ~96% of right answers accepted, ~6% of look-alike wrong ones
+      lastInk = pad.strokes.map(st => st.slice());
+      const ok = answerOk(pad.strokes, p.ans, maxN);
       if (ok){ locked = true; padEl.classList.add('locked', 'good'); okBtn.classList.remove('ready'); right(padEl, p); return; }
       tries++; sfx.oops(); okBtn.classList.remove('ready');
+      stage.querySelector('#mParent').hidden = false;    // a grown-up can say he wrote it right
       if (tries < 2){
         padEl.classList.add('shake'); setTimeout(() => padEl.classList.remove('shake'), 450);
         stage.querySelector('.hint-scene').hidden = false;
@@ -3310,8 +3425,9 @@ function mathGame(){
         locked = true; padEl.classList.add('locked');
         padEl.insertAdjacentHTML('beforeend', `<div class="pad-ans">${p.ans}</div>`);
         const [ye, yz] = mathYes(p);
-        say(`The answer is ${p.ans}. ${ye}`, `答案是${NUM_ZH[p.ans]}。${yz}`);
-        later(next, 3200);
+        say(`The answer is ${p.ans}. ${ye}`, `答案是${numZh(p.ans)}。${yz}`);
+        const thisQ = n;
+        later(() => { if (n === thisQ && !confirmed) next(); }, 3200);
       }
     };
   }
@@ -3320,7 +3436,7 @@ function mathGame(){
     const prev = store.get('math.game', null);
     const bestToday = prev && prev.d === todayKey() ? Math.max(prev.score, score) : score;
     store.set('math.game', {d: todayKey(), score: bestToday});
-    logToday(e => { e.math = Math.max(e.math || 0, score); });
+    logToday(e => { e.math = Math.max(e.math || 0, score); e.mathLvl = Math.max(e.mathLvl || 1, mathLevel()); });
     later(() => taskBonus('math', stage.querySelector('.cheer-card')), 50);
     stage.innerHTML = `<div class="cheer-card">
       <div class="wc-emoji">${score >= 16 ? '🏆' : score >= 10 ? '🥈' : '💪'}</div>
