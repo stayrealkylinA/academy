@@ -1,6 +1,6 @@
 // Keeps the app working offline. Shows the saved copy right away and
 // quietly fetches the newest version in the background for next time.
-const CACHE = 'academy-v24';
+const CACHE = 'academy-v25';
 // 3D pictures live in their own store, so app updates don't download them again
 const PICS = 'academy-pics-v1';
 const FILES = ['./', './index.html', './manifest.webmanifest',
