@@ -2504,7 +2504,7 @@ const WORDS = [
 ];
 const CRAYONS = ['#7048e8','#f03e3e','#1c7ed6','#2f9e44','#f76707','#e64980'];
 const TRACE_TOL = 17;   // how far (in letter units) the pen may wander from the path
-const NEAT_TOL = 8, NEAT_2 = 0.85, NEAT_1 = 0.55;   // word-trace stars: 2 if 85%+ of his line is on the path, 1 if 55%+
+const NEAT_TOL = 13, NEAT_2 = 0.7;   // word-trace stars: 2 if 70%+ of his line is near the path; finishing a word always earns 1
 const TRACE_LOOK = 7;   // how many sample points ahead the pen may "skip"
 const pathD = pts => 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L');
 function samplePts(pts){
@@ -2520,7 +2520,7 @@ function samplePts(pts){
 /* ---------- handwriting grader ---------- */
 const GRADE_R = 0.11;                 // match radius, as a fraction of letter size
 const GRADE_ANG = 0.6;                // max difference in line direction (radians)
-const STAMP_3 = 0.78, STAMP_2 = 0.55;// score needed for 3 / 2 stamps
+const STAMP_3 = 0.7, STAMP_2 = 0.45; // score needed for 3 / 2 stamps (kind to little hands)
 // sample a stroke and attach the (undirected) line direction at each point
 function dirPts(stroke){
   const S = samplePts(stroke);
@@ -2939,7 +2939,7 @@ function traceScreen(stage, mode){
     const isWord = !isL || !!it.isWord;
     if (isWord){
       // words: 0-2 stars for how neatly he traced
-      const neat = neatness(), n = neat >= NEAT_2 ? 2 : neat >= NEAT_1 ? 1 : 0;
+      const neat = neatness(), n = neat >= NEAT_2 ? 2 : 1;
       sfx.yay();
       for (let i = 0; i < n; i++) flyStar(board, 300 + i * 260);
       const fx = document.createElement('div'); fx.className = 'neat-fx n' + n;
